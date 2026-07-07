@@ -1,1819 +1,1819 @@
-﻿<!doctype html>
-<html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRA Auto Gantt</title>
-  <style>
-    :root {
-      --bg: #f6f7f9;
-      --panel: #ffffff;
-      --ink: #101827;
-      --muted: #5f6878;
-      --line: #d9dee8;
-      --soft-line: #edf0f5;
-      --consultant: #56a6f6;
-      --consultant-stroke: #1f6fbd;
-      --consultant-estimate: #acd8fb;
-      --aot: #f8d84c;
-      --aot-stroke: #c9960b;
-      --aot-estimate: #fff0a3;
-      --meeting: #e63f3f;
-      --planned: #16a34a;
-      --adjusted: #7c3aed;
-      --reserve: #c4b5fd;
-      --today: #111827;
-      --header: #202a3a;
-      --row: 86px;
-      --label: 1124px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      font-size: 15px;
-    }
-    .app {
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-    }
-    header {
-      padding: 18px 24px 14px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 720;
-      letter-spacing: 0;
-    }
-    .sub {
-      margin-top: 5px;
-      max-width: 660px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    button, select {
-      height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      padding: 0 11px;
-      font: inherit;
-    }
-    button {
-      cursor: pointer;
-      font-weight: 620;
-    }
-    button.primary {
-      background: #1f6fbd;
-      border-color: #1f6fbd;
-      color: #fff;
-    }
-    button.danger {
-      background: #fff1f2;
-      border-color: #f43f5e;
-      color: #be123c;
-    }
-    button.quiet {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      color: #334155;
-    }
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-    .toolbar-group {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px;
-      border: 1px solid #dbe3ee;
-      border-radius: 9px;
-      background: #f8fafc;
-    }
-    .revision-tools {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-    }
-    .revision-period { min-width: 190px; }
-    .reference-date-control {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #334155;
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .reference-date-control input {
-      height: 34px;
-      border: 1px solid #cbd5e1;
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      padding: 0 8px;
-      font: inherit;
-      min-width: 138px;
-    }
-    #scrollStart, #scrollLeft, #scrollRight, #scrollEnd {
-      min-width: 38px;
-      padding: 0 9px;
-      font-size: 17px;
-      line-height: 1;
-    }
-    .scroll-controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-width: min(460px, 100%);
-    }
-    .timeline-slider {
-      width: clamp(160px, 24vw, 320px);
-      accent-color: #1f6fbd;
-      cursor: pointer;
-    }
-    .sticky-tools {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 8px 18px rgba(16, 24, 39, .05);
-    }
-    .legend {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 10px 24px;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-    .scroll-dock {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 9px 24px 10px;
-      background: #fff;
-      border-top: 1px solid var(--soft-line);
-    }
-    .key { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
-    .swatch { width: 24px; height: 12px; border-radius: 3px; border: 1px solid; }
-    .swatch.consultant { background: var(--consultant); border-color: var(--consultant-stroke); }
-    .swatch.aot { background: var(--aot); border-color: var(--aot-stroke); }
-    .swatch.reserve { background: var(--reserve); border-color: var(--adjusted); }
-    .diamond {
-      width: 12px;
-      height: 12px;
-      background: var(--meeting);
-      transform: rotate(45deg);
-      border-radius: 2px;
-      display: inline-block;
-    }
-    .diamond.planned { background: var(--planned); }
-    .diamond.adjusted { background: var(--adjusted); }
-    .timing-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      display: inline-block;
-      border: 1px solid;
-    }
-    .timing-dot.actual { background: #2563eb; border-color: #1d4ed8; }
-    .timing-dot.estimate { background: #bfdbfe; border-color: #60a5fa; border-style: dashed; }
-    .workspace {
-      overflow: auto;
-      padding: 18px 24px 28px;
-    }
-    .summary {
-      position: sticky;
-      left: 24px;
-      z-index: 6;
-      width: calc(100vw - 48px);
-      display: grid;
-      grid-template-columns: repeat(5, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-      min-width: 760px;
-    }
-    .metric {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 11px 12px;
-    }
-    .metric b { display: block; font-size: 19px; margin-bottom: 3px; line-height: 1.18; }
-    .metric span { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
-    .metric.good { border-color: #22c55e; }
-    .metric.early { border-color: #0ea5e9; }
-    .metric.late { border-color: #ef4444; }
-    .period-summary { display: none; }
-    .period-summary-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .period-summary h2 {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.2;
-    }
-    .period-summary-note {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .period-summary table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .period-summary th,
-    .period-summary td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--soft-line);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .period-summary th:first-child,
-    .period-summary td:first-child { text-align: left; }
-    .period-summary tr:last-child td { border-bottom: 0; }
-    .contract-summary {
-      position: sticky;
-      left: 24px;
-      z-index: 4;
-      width: calc(100vw - 48px);
-      min-width: 760px;
-      margin-top: 14px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    .contract-summary-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .contract-summary h2 {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.2;
-    }
-    .contract-summary-note {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .contract-summary table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .contract-summary th,
-    .contract-summary td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--soft-line);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .contract-summary th:first-child,
-    .contract-summary td:first-child,
-    .contract-summary th:nth-child(2),
-    .contract-summary td:nth-child(2) {
-      text-align: left;
-    }
-    .contract-summary tr:last-child td { border-bottom: 0; }
-    .contract-summary .late { color: #b91c1c; font-weight: 750; }
-    .contract-summary .early { color: #075985; font-weight: 750; }
-    .contract-summary .good { color: #166534; font-weight: 750; }
-    .timing-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 72px;
-      height: 28px;
-      border-radius: 999px;
-      padding: 0 9px;
-      font-size: 13px;
-      font-weight: 700;
-      border: 1px solid;
-    }
-    .timing-pill.actual { background: #dbeafe; border-color: #60a5fa; color: #1e40af; }
-    .timing-pill.estimate { background: #fef9c3; border-color: #facc15; color: #854d0e; }
-    .timing-pill.good { background: #dcfce7; border-color: #22c55e; color: #166534; }
-    .timing-pill.early { background: #e0f2fe; border-color: #38bdf8; color: #075985; }
-    .timing-pill.late { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
-    .timing-pill.forecast {
-      background: #ffedd5;
-      border-color: #f97316;
-      color: #9a3412;
-    }
-    .board {
-      width: calc(var(--label) + var(--timeline-width, 980px));
-      min-width: 1540px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: visible;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    :root.quarter-scale {
-      --label: 556px;
-    }
-    :root.quarter-scale .board {
-      min-width: 0;
-    }
-    :root.quarter-scale .left-head,
-    :root.quarter-scale .cell-grid {
-      grid-template-columns: 206px 190px 160px;
-    }
-    :root.quarter-scale .left-head > div,
-    :root.quarter-scale .cell-grid > div {
-      display: block;
-    }
-    :root.quarter-scale .month-label,
-    :root.quarter-scale .meeting-label {
-      display: none;
-    }
-    :root.quarter-scale .week-label {
-      top: 28px;
-      color: #334155;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .gantt-head, .gantt-row, .section-row {
-      display: grid;
-      grid-template-columns: var(--label) var(--timeline-width, 980px);
-      width: 100%;
-    }
-    .left-head {
-      background: var(--header);
-      color: #fff;
-      border-right: 1px solid #111827;
-      display: grid;
-      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
-      align-items: center;
-      min-height: 84px;
-      position: sticky;
-      left: 0;
-      z-index: 24;
-    }
-    .left-head > div, .cell-grid > div {
-      padding: 9px 10px;
-      min-width: 0;
-    }
-    .left-head > div:nth-child(n+11) { display: none; }
-    .left-head > div { border-right: 1px solid rgba(255,255,255,.14); }
-    .cell-grid > div { border-right: 1px solid var(--soft-line); }
-    .timeline-head {
-      position: relative;
-      min-height: 84px;
-      background-color: #fbfcff;
-      background-image: repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px));
-      border-bottom: 1px solid var(--line);
-      overflow: hidden;
-    }
-    .month-label {
-      position: absolute;
-      top: 10px;
-      height: 20px;
-      padding-left: 6px;
-      color: #334155;
-      font-size: 13px;
-      border-left: 1px solid var(--line);
-      white-space: nowrap;
-    }
-    .week-label {
-      position: absolute;
-      top: 46px;
-      height: 22px;
-      padding-left: 4px;
-      color: #64748b;
-      font-size: 12px;
-      border-left: 1px solid var(--soft-line);
-      white-space: nowrap;
-    }
-    .section-row {
-      height: 32px;
-      background: #eef3f8;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .section-title {
-      position: sticky;
-      left: 0;
-      z-index: 22;
-      background: #eef3f8;
-      padding: 7px 12px;
-      font-weight: 720;
-      color: #0f172a;
-      border-right: 1px solid var(--line);
-    }
-    .section-timeline {
-      background-color: #eef3f8;
-      background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .72) 0, rgba(203, 213, 225, .72) 1px, transparent 1px, transparent var(--week-width, 112px));
-      overflow: hidden;
-    }
-    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
-    .cell-grid {
-      position: sticky;
-      left: 0;
-      z-index: 20;
-      background: #fff;
-      display: grid;
-      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
-      align-items: center;
-      border-right: 1px solid var(--line);
-    }
-    .cell-grid input, .cell-grid select {
-      width: 100%;
-      height: 28px;
-      border: 1px solid transparent;
-      border-radius: 5px;
-      background: transparent;
-      padding: 0 5px;
-      color: var(--ink);
-      font: inherit;
-      min-width: 0;
-    }
-    .period-cell {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 14px;
-    }
-    .period-cell.number {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .cell-grid input:hover, .cell-grid input:focus,
-    .cell-grid select:hover, .cell-grid select:focus {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      outline: none;
-    }
-    .type-pill {
-      height: 24px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 8px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .type-pill.consultant { background: #dceefe; color: #155ba1; }
-    .type-pill.aot { background: #fff4b8; color: #8a6100; }
-    .end-date {
-      color: #334155;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .timeline {
-      position: relative;
-      z-index: 1;
-      min-height: var(--row);
-      overflow: hidden;
-      background-color: #fff;
-      background-image:
-        repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px)),
-        linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0));
-      background-size: auto, 100% 100%;
-    }
-    .bar {
-      position: absolute;
-      top: 13px;
-      height: 22px;
-      border-radius: 4px;
-      border: 1px solid;
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,.08);
-    }
-    .bar.consultant.actual { background: var(--consultant); border-color: var(--consultant-stroke); }
-    .bar.aot.actual { background: var(--aot); border-color: var(--aot-stroke); }
-    .bar.consultant.estimate {
-      background: var(--consultant-estimate);
-      border-color: var(--consultant-stroke);
-      border-style: dashed;
-    }
-    .bar.aot.estimate {
-      background: var(--aot-estimate);
-      border-color: var(--aot-stroke);
-      border-style: dashed;
-    }
-    .reserve-bar {
-      position: absolute;
-      top: 55px;
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(196, 181, 253, .72);
-      border: 1px solid rgba(124, 58, 237, .72);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
-      z-index: 2;
-    }
-    .planned-marker,
-    .adjusted-marker {
-      position: absolute;
-      top: 50px;
-      width: 15px;
-      height: 15px;
-      margin-left: -7px;
-      border: 2px solid #fff;
-      transform: rotate(45deg);
-      border-radius: 3px;
-      z-index: 5;
-    }
-    .planned-marker {
-      background: var(--planned);
-      outline: 1px solid rgba(21, 128, 61, .65);
-    }
-    .adjusted-marker {
-      background: var(--adjusted);
-      outline: 1px solid rgba(91, 33, 182, .65);
-    }
-    .planned-label,
-    .adjusted-label {
-      display: none;
-    }
-    .planned-label { color: #15803d; }
-    .adjusted-label { color: #6d28d9; }
-    .today-line {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      margin-left: -1px;
-      background: var(--today);
-      opacity: .42;
-      z-index: 4;
-      pointer-events: none;
-    }
-    .timeline-head .today-line { opacity: .62; }
-    .today-chart-line {
-      display: none;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      margin-left: -1px;
-      background: var(--today);
-      opacity: .7;
-      z-index: 18;
-      pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(255,255,255,.75);
-    }
-    .today-label {
-      position: absolute;
-      top: 72px;
-      transform: translateX(-50%);
-      color: var(--today);
-      font-size: 10px;
-      font-weight: 700;
-      white-space: nowrap;
-      z-index: 5;
-    }
-    .meeting-marker {
-      position: absolute;
-      top: 15px;
-      width: 16px;
-      height: 16px;
-      margin-left: -8px;
-      background: var(--meeting);
-      border: 2px solid #fff;
-      outline: 1px solid rgba(145, 25, 25, .6);
-      transform: rotate(45deg);
-      border-radius: 3px;
-      z-index: 5;
-    }
-    .meeting-label {
-      position: absolute;
-      top: 37px;
-      transform: translateX(-50%);
-      color: #b91c1c;
-      font-size: 11px;
-      white-space: nowrap;
-      z-index: 5;
-    }
-    .editor-panel {
-      position: sticky;
-      left: 24px;
-      z-index: 5;
-      width: calc(100vw - 48px);
-      min-width: 980px;
-      margin-top: 16px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    .editor-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .editor-head h2 {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.25;
-    }
-    .editor-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .editor-actions select,
-    .editor-actions button {
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      padding: 0 9px;
-      font: inherit;
-      font-size: 13px;
-    }
-    .editor-actions button {
-      border-color: #2563eb;
-      background: #2563eb;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .editor-actions button.danger {
-      border-color: #f43f5e;
-      background: #fff1f2;
-      color: #be123c;
-    }
-    .editor-meta {
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .editor-table-wrap { overflow-x: auto; }
-    .editor-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 14px;
-    }
-    .editor-table th,
-    .editor-table td {
-      border-bottom: 1px solid var(--soft-line);
-      border-right: 1px solid var(--soft-line);
-      padding: 8px 9px;
-      text-align: left;
-      vertical-align: middle;
-    }
-    .editor-table th {
-      background: #f8fafc;
-      color: #334155;
-      font-weight: 720;
-      white-space: nowrap;
-    }
-    .editor-table td:last-child,
-    .editor-table th:last-child { border-right: 0; }
-    .editor-table tr.current-work-row td {
-      background: #fff7ed;
-      box-shadow: inset 4px 0 0 #f97316;
-    }
-    .editor-table tr.current-work-row input,
-    .editor-table tr.current-work-row select {
-      border-color: #fb923c;
-      background: #fffaf5;
-    }
-    .editor-table tr:last-child td { border-bottom: 0; }
-    .editor-table input,
-    .editor-table select {
-      width: 100%;
-      height: 34px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #fff;
-      padding: 0 8px;
-      color: var(--ink);
-      font: inherit;
-      min-width: 0;
-    }
-    .editor-table input[type="number"] {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .editor-table .number {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .editor-period {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 650;
-    }
-    @media (max-width: 760px) {
-      header { flex-direction: column; }
-      .toolbar { justify-content: flex-start; }
-      .scroll-dock { align-items: flex-start; flex-direction: column; }
-      .workspace { padding: 12px; }
-      .summary, .period-summary, .contract-summary, .editor-panel {
-        left: 12px;
-        width: calc(100vw - 24px);
-      }
-      .summary { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
-    }
-    @media print {
-      @page { size: A4 landscape; margin: 8mm; }
-      :root { --row: 52px; }
-      body { background: #fff; }
-      html, body { width: 297mm; height: 210mm; overflow: hidden; }
-      .app { display: block; min-height: 0; }
-      header {
-        position: static;
-        box-shadow: none;
-        padding: 0 0 5px;
-        border-bottom: 0;
-      }
-      header h1 { font-size: 16px; margin-bottom: 2px; }
-      header .sub { font-size: 9px; }
-      .toolbar, .scroll-dock, .editor-panel { display: none !important; }
-      .sticky-tools {
-        position: static;
-        box-shadow: none;
-        border-bottom: 0;
-        padding: 0 0 5px;
-      }
-      .legend {
-        padding: 0;
-        gap: 6px 9px;
-        font-size: 8px;
-      }
-      .swatch { width: 16px; height: 8px; }
-      .diamond, .timing-dot { width: 8px; height: 8px; }
-      .workspace { overflow: visible; padding: 0; }
-      .summary {
-        position: static;
-        left: auto;
-        width: 100%;
-        min-width: 0;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 4px;
-        margin-bottom: 6px;
-      }
-      .metric {
-        border-radius: 4px;
-        padding: 5px 6px;
-      }
-      .metric b { font-size: 10px; line-height: 1.15; }
-      .metric span { font-size: 8px; line-height: 1.2; }
-      .bar,
-      .swatch,
-      .diamond,
-      .timing-dot,
-      .reserve-bar,
-      .planned-marker,
-      .adjusted-marker,
-      .meeting-marker,
-      .timing-pill {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .board {
-        box-shadow: none;
-        border-radius: 0;
-        transform: scale(.82);
-        transform-origin: top left;
-      }
-      .contract-summary {
-        position: static;
-        left: auto;
-        width: 100%;
-        min-width: 0;
-        margin-top: -4px;
-        border-radius: 4px;
-        box-shadow: none;
-      }
-      .contract-summary-head {
-        padding: 5px 6px;
-      }
-      .contract-summary h2 { font-size: 10px; }
-      .contract-summary-note { font-size: 8px; }
-      .contract-summary table { font-size: 8px; }
-      .contract-summary th,
-      .contract-summary td {
-        padding: 3px 5px;
-      }
-      .left-head, .timeline-head { min-height: 56px; }
-      .left-head > div, .cell-grid > div { padding: 6px 7px; font-size: 10px; }
-      .week-label { top: 22px; font-size: 9px; }
-      .today-label { font-size: 8px; }
-      .today-chart-line,
-      .today-line {
-        display: block;
-        background: transparent !important;
-        border-left: 2px solid #111827;
-        width: 0;
-        opacity: 1;
-        box-shadow: none;
-      }
-      .timeline-head .today-line {
-        border-left-width: 2px;
-        opacity: 1;
-      }
-      .bar { top: 8px; height: 16px; }
-      .reserve-bar { top: 35px; height: 8px; }
-      .planned-marker, .adjusted-marker { top: 31px; width: 11px; height: 11px; }
-      .meeting-marker { top: 9px; width: 11px; height: 11px; }
-      button, select.range, input[type="range"] { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <header>
-      <div>
-        <h1>CRA Auto Gantt - Consultant vs AOT Review</h1>
-        <div class="sub">แก้ไขวันที่จากตารางปรับวันที่ด้านล่าง กราฟจะคำนวณวันสิ้นสุด จำนวนวัน และเลื่อนช่วงงานถัดไปอัตโนมัติ พร้อม marker วันประชุมตรวจรับ</div>
-      </div>
-      <div class="toolbar">
-        <div class="toolbar-group revision-tools" aria-label="จัดการรอบแก้ไข">
-          <select id="toolbarRevisionPeriod" class="revision-period" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข"></select>
-          <button id="toolbarAddRevisionRound" class="primary" type="button">เพิ่มรอบแก้ไข</button>
-          <button id="toolbarRemoveRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
-        </div>
-        <div class="toolbar-group file-tools" aria-label="จัดการข้อมูล">
-          <label class="reference-date-control">ข้อมูล ณ วันที่ <input id="referenceDate" type="date"></label>
-          <button id="undoBtn" class="quiet" type="button" disabled>Undo</button>
-          <button id="addRow" class="quiet" type="button">เพิ่มแถวเปล่า</button>
-          <button id="saveHtmlBtn" class="primary" type="button">Save HTML</button>
-          <button id="printBtn" class="primary" type="button">Save as PDF</button>
-        </div>
-      </div>
-    </header>
-    <div class="sticky-tools">
-      <div class="legend">
-        <span class="key"><span class="diamond planned"></span>กำหนดส่งเดิม</span>
-        <span class="key"><span class="swatch reserve"></span>วันสงวนสิทธิ์สะสม</span>
-        <span class="key"><span class="diamond adjusted"></span>กำหนดส่งใหม่</span>
-        <span class="key"><span class="swatch consultant"></span>ที่ปรึกษา ทำงาน/แก้ไข/ส่งงาน</span>
-        <span class="key"><span class="swatch aot"></span>ทอท. พิจารณา/ตรวจรับ</span>
-        <span class="key"><span class="diamond"></span>วันประชุมคณะกรรมการตรวจรับ</span>
-        <span class="key"><span class="timing-dot actual"></span>Actual ก่อนวันนี้</span>
-        <span class="key"><span class="timing-dot estimate"></span>Estimate ตั้งแต่วันนี้เป็นต้นไป</span>
-      </div>
-      <div class="scroll-dock">
-        <select id="scale" class="range" title="ช่วงเวลา">
-          <option value="7">รายสัปดาห์</option>
-          <option value="14">ทุก 2 สัปดาห์</option>
-          <option value="30">รายเดือน</option>
-          <option value="90" selected>รายไตรมาส</option>
-        </select>
-        <div class="scroll-controls" aria-label="เลื่อนซ้ายขวา">
-          <button id="scrollStart" type="button" title="ไปซ้ายสุด">&laquo;</button>
-          <button id="scrollLeft" type="button" title="เลื่อนไปซ้าย">&lsaquo;</button>
-          <input id="timelineSlider" class="timeline-slider" type="range" min="0" value="0" step="1" aria-label="เลื่อนซ้ายขวา">
-          <button id="scrollRight" type="button" title="เลื่อนไปขวา">&rsaquo;</button>
-          <button id="scrollEnd" type="button" title="ไปขวาสุด">&raquo;</button>
-        </div>
-      </div>
-    </div>
-    <main class="workspace">
-      <section class="summary" id="summary"></section>
-      <section class="board" id="board"></section>
-      <section class="contract-summary" id="contractSummary"></section>
-      <section class="editor-panel" id="editor"></section>
-    </main>
-  </div>
-
-  <script>
-    const defaultRows = [
-      { period: 'งวด 1 Inception', org: 'ที่ปรึกษา', item: 'ส่งงาน', type: 'Consultant', start: '2025-08-22', duration: 29, meeting: '2025-09-25', status: 'Actual' },
-      { period: 'งวด 1 Inception', org: 'ทอท.', item: 'ตรวจรับ/ประชุม', type: 'AOT', start: '2025-09-20', duration: 6, meeting: '2025-09-25', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2025-09-20', duration: 41, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2025-10-31', duration: 25, meeting: '2025-11-17', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2025-11-25', duration: 52, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-01-16', duration: 41, meeting: '2026-02-17', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-02-26', duration: 2, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-02-28', duration: 6, meeting: '2026-03-05', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-02-28', duration: 26, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-03-26', duration: 29, meeting: '2026-04-10', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-04-24', duration: 7, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-05-01', duration: 27, meeting: '2026-05-21', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-05-28', duration: 16, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-06-13', duration: 11, meeting: '2026-06-23', status: 'Actual' },
-      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-06-13', duration: 18, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-07-01', duration: 31, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-08-01', duration: 13, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-08-14', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-08-14', duration: 51, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-10-05', duration: 46, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-11-20', duration: 21, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-12-11', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-12-11', duration: 16, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-12-27', duration: 31, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-01-27', duration: 11, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-02-07', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2027-02-07', duration: 46, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2027-03-25', duration: 46, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-05-10', duration: 16, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-05-26', duration: 1, meeting: '', status: 'Estimate' }
-    ];
-
-    const board = document.getElementById('board');
-    const editor = document.getElementById('editor');
-    const summary = document.getElementById('summary');
-    const contractSummary = document.getElementById('contractSummary');
-    const workspace = document.querySelector('.workspace');
-    const timelineSlider = document.getElementById('timelineSlider');
-    const scale = document.getElementById('scale');
-    const referenceDateInput = document.getElementById('referenceDate');
-    const storageKey = 'cra-auto-gantt-web-v3';
-    const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
-    const undoLimit = 10;
-    const TOR_CONSULTANT_DAYS = 365;
-    const TOR_CUMULATIVE_DAYS_BY_PERIOD = {
-      1: 30,
-      2: 60,
-      3: 120,
-      4: 180,
-      5: 270,
-      6: 300,
-      7: 365
-    };
-    const plannedEndByPeriod = {
-      1: '2025-09-20',
-      2: '2025-10-20',
-      3: '2025-12-19',
-      4: '2026-02-17',
-      5: '2026-05-18',
-      6: '2026-06-17',
-      7: '2026-08-21'
-    };
-    let rows = loadRows();
-    let undoStack = [];
-    let durationEditTimer = null;
-    removeAccidentalDevelopmentRounds();
-    alignRowsAfterPass();
-
-    function loadRows() {
-      try {
-        const saved = localStorage.getItem(storageKey);
-        return saved ? JSON.parse(saved) : structuredClone(defaultRows);
-      } catch (_) {
-        return structuredClone(defaultRows);
-      }
-    }
-    function saveRows() { localStorage.setItem(storageKey, JSON.stringify(rows)); }
-    function cloneRows() { return structuredClone(rows); }
-    function pushUndo() {
-      undoStack.push(cloneRows());
-      if (undoStack.length > undoLimit) undoStack.shift();
-      updateUndoButtons();
-    }
-    function updateUndoButtons() {
-      document.querySelectorAll('[data-action="undo"], #undoBtn').forEach(button => {
-        button.disabled = undoStack.length === 0;
-        button.textContent = undoStack.length ? `Undo (${undoStack.length})` : 'Undo';
-      });
-    }
-    function undoLastChange() {
-      if (!undoStack.length) return;
-      rows = undoStack.pop();
-      render();
-    }
-    function revisionRoundNumber(row) {
-      const match = String(row.item || '').match(/รอบ\s*(\d+)/);
-      return match ? Number(match[1]) : 0;
-    }
-    function removeAccidentalDevelopmentRounds() {
-      const firstRemoveIndex = rows.findIndex(row => row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row)));
-      if (firstRemoveIndex < 0) return;
-      rows = rows.filter(row => !(row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row))));
-      normalizeSequentialRows(firstRemoveIndex);
-    }
-    const TH_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-    const BANGKOK_TIME_ZONE = 'Asia/Bangkok';
-    function parseDate(value) {
-      if (!value) return null;
-      const parts = String(value).split('-').map(Number);
-      if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
-      return new Date(parts[0], parts[1] - 1, parts[2]);
-    }
-    function isoDate(date) {
-      if (!date) return '';
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-    function todayDate() {
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: BANGKOK_TIME_ZONE,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).formatToParts(new Date()).reduce((acc, part) => {
-        acc[part.type] = part.value;
-        return acc;
-      }, {});
-      return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
-    }
-    function setupReferenceDate() {
-      const saved = localStorage.getItem(referenceDateStorageKey);
-      referenceDateInput.value = saved || isoDate(todayDate());
-    }
-    function referenceDate() {
-      return parseDate(referenceDateInput.value) || todayDate();
-    }
-    function addDays(date, days) {
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-    }
-    function dateOrdinal(date) {
-      return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
-    }
-    function diffDays(a, b) {
-      return dateOrdinal(b) - dateOrdinal(a);
-    }
-    function shiftDateValue(value, deltaDays) {
-      const date = parseDate(value);
-      return date && deltaDays ? isoDate(addDays(date, deltaDays)) : value;
-    }
-    function shiftRowsFrom(startIndex, deltaDays) {
-      if (!deltaDays) return;
-      for (let i = startIndex; i < rows.length; i += 1) {
-        rows[i].start = shiftDateValue(rows[i].start, deltaDays);
-        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
-      }
-    }
-    function formatShort(value) {
-      const date = parseDate(value);
-      if (!date) return '';
-      const day = String(date.getDate()).padStart(2, '0');
-      const year = String(date.getFullYear() + 543).slice(-2);
-      return `${day} ${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
-    }
-    function formatMonthYear(date) {
-      const year = String(date.getFullYear() + 543).slice(-2);
-      return `${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
-    }
-    function endDate(row) {
-      const start = parseDate(row.start);
-      const duration = durationValue(row);
-      return start ? addDays(start, duration - 1) : null;
-    }
-    function durationValue(row) {
-      return Math.max(1, Math.round(Number(row.duration) || 1));
-    }
-    function periodNumber(period) {
-      const match = String(period || '').match(/\d+/);
-      return match ? Number(match[0]) : null;
-    }
-    function isAotOneDayHandoff(row) {
-      return row.type === 'AOT' && durationValue(row) === 1;
-    }
-    function isAotPassRow(row) {
-      return row.type === 'AOT' && String(row.item || '').includes('ผ่าน');
-    }
-    function isAotExcludedFromWork(row) {
-      return isAotOneDayHandoff(row) || isAotPassRow(row);
-    }
-    function sequencingAnchorIndex(rowIndex) {
-      for (let i = rowIndex - 1; i >= 0; i -= 1) {
-        if (!isAotPassRow(rows[i])) return i;
-      }
-      return -1;
-    }
-    function normalizeSequentialRows(startIndex = 1) {
-      for (let i = Math.max(1, startIndex); i < rows.length; i += 1) {
-        const anchorIndex = sequencingAnchorIndex(i);
-        const previousEnd = anchorIndex >= 0 ? endDate(rows[anchorIndex]) : null;
-        if (!previousEnd) continue;
-        const nextStart = addDays(previousEnd, 1);
-        const nextStartValue = isoDate(nextStart);
-        if (rows[i].start === nextStartValue) continue;
-        const oldStart = parseDate(rows[i].start);
-        const deltaDays = oldStart ? diffDays(oldStart, nextStart) : 0;
-        rows[i].start = nextStartValue;
-        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
-      }
-    }
-    function alignRowsAfterPass() {
-      for (let i = 0; i < rows.length - 1; i += 1) {
-        const passRow = rows[i];
-        const nextRow = rows[i + 1];
-        if (!isAotPassRow(passRow) || nextRow.type !== 'Consultant' || nextRow.period === passRow.period) continue;
-        if (!passRow.start || nextRow.start === passRow.start) continue;
-        const oldStart = parseDate(nextRow.start);
-        const newStart = parseDate(passRow.start);
-        const deltaDays = oldStart && newStart ? diffDays(oldStart, newStart) : 0;
-        nextRow.start = passRow.start;
-        nextRow.meeting = shiftDateValue(nextRow.meeting, deltaDays);
-        normalizeSequentialRows(i + 2);
-      }
-    }
-    function syncMeetingWhenEndMoves(row, oldEnd, newEnd) {
-      const meeting = parseDate(row.meeting);
-      if (meeting && oldEnd && newEnd && diffDays(meeting, oldEnd) === 0) {
-        row.meeting = isoDate(newEnd);
-      }
-    }
-    function rowTiming(row, today) {
-      const end = endDate(row);
-      return end && end < today ? 'actual' : 'estimate';
-    }
-    function torStatus(delta) {
-      if (delta > 0) return { text: `ช้ากว่า TOR ${delta} วัน`, cls: 'late' };
-      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early' };
-      return { text: 'ตรงตาม TOR', cls: 'good' };
-    }
-    function torDaysForPeriod(period) {
-      return TOR_CUMULATIVE_DAYS_BY_PERIOD[periodNumber(period)] || TOR_CONSULTANT_DAYS;
-    }
-    function torVarianceStatus(actualDays, torDays) {
-      const delta = actualDays - torDays;
-      if (delta > 0) return { text: `ล่าช้า ${delta} วัน`, cls: 'late', delta };
-      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early', delta };
-      return { text: 'ตรงตาม TOR', cls: 'good', delta };
-    }
-    function periodRangeText(item) {
-      if (!item.consultantStart || !item.consultantEnd) return '-';
-      return `${formatShort(isoDate(item.consultantStart))} - ${formatShort(isoDate(item.consultantEnd))}`;
-    }
-    function consultantDaysThrough(today) {
-      return rows
-        .filter(row => row.type === 'Consultant')
-        .reduce((sum, row) => {
-          const start = parseDate(row.start);
-          const end = endDate(row);
-          if (!start || !end || start > today) return sum;
-          const countedEnd = end > today ? today : end;
-          return sum + Math.max(0, diffDays(start, countedEnd) + 1);
-        }, 0);
-    }
-    function currentPeriodStats(periods, today) {
-      const activeRow = rows.find(row => {
-        const start = parseDate(row.start);
-        const end = endDate(row);
-        return start && end && start <= today && today <= end;
-      });
-      if (activeRow) return periods.find(item => item.period === activeRow.period) || periods[0] || null;
-      return periods.find(item => item.earliestStart && today < item.earliestStart)
-        || periods.find(item => item.adjustedDue && today <= item.adjustedDue)
-        || periods[periods.length - 1]
-        || null;
-    }
-    function dueStatus(adjustedDue, today) {
-      if (!adjustedDue) return { text: 'ยังไม่พบกำหนดส่งใหม่', cls: '' };
-      const daysToDue = diffDays(today, adjustedDue);
-      if (daysToDue < 0) return { text: `ปัจจุบันล่าช้า ${Math.abs(daysToDue)} วัน`, cls: 'late' };
-      if (daysToDue > 0) return { text: `เหลือเวลา ${daysToDue} วันก่อนถึงกำหนด`, cls: 'good' };
-      return { text: 'ครบกำหนดส่งวันนี้', cls: 'early' };
-    }
-    function periodStats(today) {
-      const stats = [];
-      const byPeriod = new Map();
-      rows.forEach(row => {
-        if (!byPeriod.has(row.period)) {
-          byPeriod.set(row.period, {
-            period: row.period,
-            rows: [],
-            consultant: 0,
-            consultantCum: 0,
-            aot: 0,
-            aotCum: 0,
-            reserveBefore: 0,
-            aotOneDay: 0,
-            earliestStart: null,
-            latestEnd: null,
-            consultantStart: null,
-            consultantEnd: null,
-            plannedEnd: null,
-            adjustedDue: null,
-            meetingDates: [],
-            timing: 'actual'
-          });
-          stats.push(byPeriod.get(row.period));
-        }
-        const item = byPeriod.get(row.period);
-        item.rows.push(row);
-        const duration = durationValue(row);
-        if (row.type === 'Consultant') item.consultant += duration;
-        if (row.type === 'AOT') {
-          if (isAotExcludedFromWork(row)) {
-            item.aotOneDay += duration;
-          } else {
-            item.aot += duration;
-          }
-        }
-        const start = parseDate(row.start);
-        const end = endDate(row);
-        const meeting = parseDate(row.meeting);
-        if (start && (!item.earliestStart || start < item.earliestStart)) item.earliestStart = start;
-        if (end && (!item.latestEnd || end > item.latestEnd)) item.latestEnd = end;
-        if (row.type === 'Consultant') {
-          if (start && (!item.consultantStart || start < item.consultantStart)) item.consultantStart = start;
-          if (end) item.consultantEnd = end;
-        }
-        if (meeting) item.meetingDates.push(meeting);
-        if (rowTiming(row, today) === 'estimate') item.timing = 'estimate';
-      });
-      let consultantCum = 0;
-      let aotCum = 0;
-      stats.forEach(item => {
-        const plannedEnd = parseDate(plannedEndByPeriod[periodNumber(item.period)]);
-        item.reserveBefore = aotCum;
-        item.plannedEnd = plannedEnd;
-        item.adjustedDue = plannedEnd ? addDays(plannedEnd, item.reserveBefore) : null;
-        consultantCum += item.consultant;
-        aotCum += item.aot;
-        item.consultantCum = consultantCum;
-        item.aotCum = aotCum;
-      });
-      return stats;
-    }
-    function timelineBounds() {
-      const dates = [];
-      for (const row of rows) {
-        const s = parseDate(row.start);
-        const e = endDate(row);
-        const m = parseDate(row.meeting);
-        if (s) dates.push(s);
-        if (e) dates.push(e);
-        if (m) dates.push(m);
-      }
-      for (const item of periodStats(referenceDate())) {
-        if (item.plannedEnd) dates.push(item.plannedEnd);
-        if (item.adjustedDue) dates.push(item.adjustedDue);
-      }
-      const min = dates.length ? new Date(Math.min(...dates)) : new Date(2025, 7, 18);
-      const max = dates.length ? new Date(Math.max(...dates)) : new Date(2027, 4, 31);
-      min.setDate(min.getDate() - 7);
-      max.setDate(max.getDate() + 14);
-      return { min, max };
-    }
-    function position(date, min, total, width) {
-      return Math.max(0, Math.min(width, diffDays(min, date) / total * width));
-    }
-    function scalePxPerDay(step) {
-      if (step === 90) return 0.95;
-      if (step === 30) return 7;
-      if (step === 14) return 11;
-      return 16;
-    }
-    function minTimelineWidth(step) {
-      return step === 90 ? 620 : 980;
-    }
-    function nextTickDate(date, step) {
-      if (step === 90) return new Date(date.getFullYear(), date.getMonth() + 3, 1);
-      return addDays(date, step);
-    }
-    function escapeAttr(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
-    }
-    function escapeText(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-    }
-    function makeInput(rowIndex, field, type = 'text') {
-      const row = rows[rowIndex];
-      return `<input data-row="${rowIndex}" data-field="${field}" type="${type}" value="${escapeAttr(row[field] ?? '')}">`;
-    }
-    function makeTypeSelect(rowIndex) {
-      const value = rows[rowIndex].type === 'AOT' ? 'AOT' : 'Consultant';
-      return `
-        <select data-row="${rowIndex}" data-field="type" title="ประเภทงาน">
-          <option value="Consultant"${value === 'Consultant' ? ' selected' : ''}>Consultant</option>
-          <option value="AOT"${value === 'AOT' ? ' selected' : ''}>AOT</option>
-        </select>`;
-    }
-    function renderSummary() {
-      const today = referenceDate();
-      const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0);
-      const aotReview = rows
-        .filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r))
-        .reduce((sum, r) => sum + durationValue(r), 0);
-      const aotOneDay = rows.filter(isAotExcludedFromWork).reduce((sum, r) => sum + durationValue(r), 0);
-      const aotRaw = aotReview + aotOneDay;
-      const aot = aotReview;
-      const periods = periodStats(today);
-      const currentPeriod = currentPeriodStats(periods, today);
-      const consultantToDate = consultantDaysThrough(today);
-      const variance = consultant - TOR_CONSULTANT_DAYS;
-      const tor = torStatus(variance);
-      const currentTorDays = currentPeriod ? torDaysForPeriod(currentPeriod.period) : TOR_CONSULTANT_DAYS;
-      const currentTor = torVarianceStatus(consultantToDate, currentTorDays);
-      summary.innerHTML = `
-        <div class="metric"><b>ข้อมูล ณ วันที่ ${formatShort(isoDate(today))}</b><span>อยู่ระหว่างการส่งงาน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
-        <div class="metric ${currentTor.cls}"><b>${consultantToDate} / ${currentTorDays} วัน</b><span>จำนวนวันทำงานของ ทปษ. ณ ปัจจุบัน เทียบ TOR ${currentPeriod ? escapeText(currentPeriod.period) : ''}<br>${currentTor.text}</span></div>
-        <div class="metric"><b>${currentPeriod ? escapeText(currentPeriod.period) : '-'}: ${currentPeriod?.adjustedDue ? formatShort(isoDate(currentPeriod.adjustedDue)) : '-'}</b><span>กำหนดส่งงานใหม่ หลังรวมวันสงวนสิทธิ์</span></div>
-        <div class="metric ${tor.cls}"><b>${consultant} / ${TOR_CONSULTANT_DAYS} วัน</b><span>จำนวนวันทำงาน ทปษ. (คาดการณ์): ${tor.text}</span></div>
-        <div class="metric"><b>${aot} วัน</b><span>วันทำงาน ทอท. นับจริง / วันสงวนสิทธิ์สะสม<br>ไม่รวม ${aotOneDay} วันของรอบผ่าน/ส่งต่อ (รวมดิบ ${aotRaw})</span></div>
-      `;
-    }
-    function renderContractSummary() {
-      const today = referenceDate();
-      const rowsHtml = periodStats(today).map(item => {
-        const torDays = torDaysForPeriod(item.period);
-        const variance = torVarianceStatus(item.consultantCum, torDays);
-        return `
-          <tr>
-            <td>${escapeText(item.period)}</td>
-            <td>${periodRangeText(item)}</td>
-            <td>${item.consultant}</td>
-            <td>${item.consultantCum}</td>
-            <td>${torDays}</td>
-            <td class="${variance.cls}">${variance.text}</td>
-          </tr>`;
-      }).join('');
-      contractSummary.innerHTML = `
-        <div class="contract-summary-head">
-          <h2>สรุปวันทำงาน ทปษ. สะสม เทียบ TOR</h2>
-          <div class="contract-summary-note">Bottom line: วันทำงาน ทปษ. สะสมต้องไม่เกิน 365 วันตาม TOR</div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>งวด</th>
-              <th>ช่วงวันทำงาน ทปษ.</th>
-              <th>วันทำงานรายงวด</th>
-              <th>Actual/Plan สะสม</th>
-              <th>TOR สะสม</th>
-              <th>ส่วนต่าง</th>
-            </tr>
-          </thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>`;
-    }
-    function renderEditor() {
-      const today = referenceDate();
-      const stats = periodStats(today);
-      const periodCount = stats.length;
-      const currentPeriod = currentPeriodStats(stats, today);
-      const periodOptions = stats.map(item => `<option value="${escapeAttr(item.period)}"${currentPeriod && currentPeriod.period === item.period ? ' selected' : ''}>${escapeText(item.period)}</option>`).join('');
-      const toolbarRevisionPeriod = document.getElementById('toolbarRevisionPeriod');
-      if (toolbarRevisionPeriod) toolbarRevisionPeriod.innerHTML = periodOptions;
-      const body = rows.map((row, index) => {
-        const end = endDate(row);
-        const rowStart = parseDate(row.start);
-        const isCurrentWorkRow = rowStart && end && today >= rowStart && today <= end;
-        const timing = rowTiming(row, today);
-        const typeValue = row.type === 'AOT' ? 'AOT' : 'Consultant';
-        return `
-          <tr class="${isCurrentWorkRow ? 'current-work-row' : ''}">
-            <td class="editor-period" title="${escapeAttr(row.period)}">${escapeText(row.period)}</td>
-            <td>${escapeText(row.org)}</td>
-            <td>${escapeText(row.item)}</td>
-            <td>
-              <select data-row="${index}" data-field="type" aria-label="ประเภทงาน">
-                <option value="Consultant"${typeValue === 'Consultant' ? ' selected' : ''}>Consultant</option>
-                <option value="AOT"${typeValue === 'AOT' ? ' selected' : ''}>AOT</option>
-              </select>
-            </td>
-            <td><input data-row="${index}" data-field="start" type="date" value="${escapeAttr(row.start || '')}" aria-label="วันเริ่ม"></td>
-            <td><input data-row="${index}" data-field="end" type="date" value="${end ? isoDate(end) : ''}" aria-label="วันสิ้นสุด"></td>
-            <td><input data-row="${index}" data-field="duration" type="number" min="1" step="1" value="${durationValue(row)}" aria-label="จำนวนวัน"></td>
-            <td><input data-row="${index}" data-field="meeting" type="date" value="${escapeAttr(row.meeting || '')}" aria-label="วันประชุมตรวจรับ"></td>
-            <td><span class="timing-pill ${timing}">${timing === 'actual' ? 'Actual' : 'Estimate'}</span></td>
-          </tr>`;
-      }).join('');
-      editor.innerHTML = `
-        <div class="editor-head">
-          <h2>ตารางปรับวันที่</h2>
-          <div class="editor-actions">
-            <button data-action="undo" class="quiet" type="button" disabled>Undo</button>
-            <select id="revisionPeriod" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข">${periodOptions}</select>
-            <button id="addRevisionRound" type="button">เพิ่มรอบแก้ไข</button>
-            <button id="removeRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
-            <div class="editor-meta">${periodCount} งวด / ${rows.length} ช่วงงาน</div>
-          </div>
-        </div>
-        <div class="editor-table-wrap">
-          <table class="editor-table">
-            <colgroup>
-              <col style="width: 220px">
-              <col style="width: 92px">
-              <col style="width: 190px">
-              <col style="width: 124px">
-              <col style="width: 142px">
-              <col style="width: 142px">
-              <col style="width: 96px">
-              <col style="width: 154px">
-              <col style="width: 110px">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>งวด</th>
-                <th>หน่วยงาน</th>
-                <th>รายการ</th>
-                <th>ประเภท</th>
-                <th>วันเริ่ม</th>
-                <th>วันสิ้นสุด</th>
-                <th class="number">จำนวนวัน</th>
-                <th>ประชุมตรวจรับ</th>
-                <th>สถานะ</th>
-              </tr>
-            </thead>
-            <tbody>${body}</tbody>
-          </table>
-        </div>`;
-    }
-    function nextRevisionRound(period) {
-      return rows
-        .filter(row => row.period === period)
-        .map(row => String(row.item || '').match(/รอบ\s*(\d+)/))
-        .filter(Boolean)
-        .reduce((max, match) => Math.max(max, Number(match[1]) || 0), 0) + 1;
-    }
-    function addRevisionRound(period) {
-      const indexes = rows.map((row, index) => row.period === period ? index : -1).filter(index => index >= 0);
-      if (!indexes.length) return;
-      const insertAt = Math.max(...indexes) + 1;
-      const lastIndex = insertAt - 1;
-      const lastEnd = endDate(rows[lastIndex]) || referenceDate();
-      const round = nextRevisionRound(period);
-      const consultantDuration = 7;
-      const aotDuration = 14;
-      const consultantStart = addDays(lastEnd, 1);
-      const aotStart = addDays(consultantStart, consultantDuration);
-      rows.splice(insertAt, 0,
-        {
-          period,
-          org: 'ที่ปรึกษา',
-          item: `รอบ ${round}`,
-          type: 'Consultant',
-          start: isoDate(consultantStart),
-          duration: consultantDuration,
-          meeting: '',
-          status: 'Estimate'
-        },
-        {
-          period,
-          org: 'ทอท.',
-          item: `พิจารณา รอบ ${round}`,
-          type: 'AOT',
-          start: isoDate(aotStart),
-          duration: aotDuration,
-          meeting: '',
-          status: 'Estimate'
-        }
-      );
-      normalizeSequentialRows(insertAt + 2);
-      render();
-    }
-    function removeLatestRevisionRound(period) {
-      const rounds = rows
-        .filter(row => row.period === period)
-        .map(revisionRoundNumber)
-        .filter(round => round > 2);
-      if (!rounds.length) return;
-      const round = Math.max(...rounds);
-      const indexes = rows
-        .map((row, index) => row.period === period && revisionRoundNumber(row) === round && row.status !== 'Actual' ? index : -1)
-        .filter(index => index >= 0);
-      if (!indexes.length) return;
-      pushUndo();
-      const firstRemoveIndex = Math.min(...indexes);
-      rows = rows.filter((_, index) => !indexes.includes(index));
-      normalizeSequentialRows(firstRemoveIndex);
-      render();
-    }
-    function render() {
-      saveRows();
-      renderSummary();
-      renderContractSummary();
-      const step = Number(scale.value) || 7;
-      const isQuarter = step === 90;
-      document.documentElement.classList.toggle('quarter-scale', isQuarter);
-      const { min, max } = timelineBounds();
-      const totalDays = Math.max(1, diffDays(min, max));
-      const pxPerDay = scalePxPerDay(step);
-      const labelWidth = isQuarter ? 556 : 1124;
-      const isPdfPrint = document.body.classList.contains('pdf-print');
-      const targetBoardWidth = isPdfPrint ? 1280 : Math.max(0, window.innerWidth - 48);
-      const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
-      const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
-      const today = referenceDate();
-      const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
-      const ticks = [];
-      let cursor = new Date(min);
-      cursor.setHours(0,0,0,0);
-      while (cursor <= max) {
-        ticks.push(new Date(cursor));
-        cursor = nextTickDate(cursor, step);
-      }
-      const months = [];
-      let monthCursor = new Date(min.getFullYear(), min.getMonth(), 1);
-      while (monthCursor <= max) {
-        months.push(new Date(monthCursor));
-        monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
-      }
-      document.documentElement.style.setProperty('--week-width', `${step * pxPerDay}px`);
-      const leftHead = isQuarter
-        ? `<div>งวด</div><div>ช่วงวันทำงาน ทปษ.</div><div>ล่าช้าเทียบ TOR</div>`
-        : `<div>งวด</div><div>ทปษ.</div><div>ทปษ. สะสม</div><div>ทอท.</div><div>ทอท. สะสม/วันสงวน</div><div>วันเริ่ม</div><div>วันสิ้นสุด ทปษ.</div><div>กำหนดเดิม</div><div>กำหนดใหม่</div><div>สถานะ</div>
-            <div>งวด</div><div>ทปษ. (วัน)</div><div>ทอท. นับจริง</div><div>ทอท. ผ่าน/ส่งต่อ</div><div>วันเริ่ม</div><div>วันสิ้นสุด</div><div>ประชุมตรวจรับ</div><div>สถานะ</div>`;
-      let html = `
-        <div class="gantt-head">
-          <div class="left-head">
-            ${leftHead}
-          </div>
-          <div class="timeline-head" style="width:${timelineWidth}px">
-            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${formatMonthYear(m)}</div>`).join('')}
-            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? formatMonthYear(t) : t.getDate()}</div>`).join('')}
-            ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
-          </div>
-        </div>`;
-      periodStats(today).forEach(item => {
-        const meetingDates = item.meetingDates
-          .map(date => isoDate(date))
-          .filter((value, index, list) => list.indexOf(value) === index);
-        const meetingText = meetingDates.length ? `${meetingDates.length} จุด` : '-';
-        const segments = item.rows.map(row => {
-          const start = parseDate(row.start);
-          const end = endDate(row);
-          if (!start || !end) return '';
-          const left = position(start, min, totalDays, timelineWidth);
-          const right = position(addDays(end, 1), min, totalDays, timelineWidth);
-          const width = Math.max(4, right - left);
-          const cls = row.type === 'AOT' ? 'aot' : 'consultant';
-          const timing = rowTiming(row, today);
-          return `<div class="bar ${cls} ${timing}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)}: ${row.start} - ${isoDate(end)} (${timing === 'actual' ? 'Actual' : 'Estimate'})" style="left:${left}px;width:${width}px"></div>`;
-        }).join('');
-        const markers = meetingDates.map(value => {
-          const meeting = parseDate(value);
-          const meetLeft = meeting ? position(meeting, min, totalDays, timelineWidth) : null;
-          return meeting ? `<div class="meeting-marker" title="ประชุมตรวจรับ ${value}" style="left:${meetLeft}px"></div><div class="meeting-label" style="left:${meetLeft}px">${formatShort(value)}</div>` : '';
-        }).join('');
-        const plannedLayer = (() => {
-          if (!item.plannedEnd || !item.adjustedDue) return '';
-          const plannedLeft = position(item.plannedEnd, min, totalDays, timelineWidth);
-          const adjustedLeft = position(item.adjustedDue, min, totalDays, timelineWidth);
-          const reserveLeft = Math.min(plannedLeft, adjustedLeft);
-          const reserveWidth = Math.abs(adjustedLeft - plannedLeft);
-          const reserveBar = item.reserveBefore > 0
-            ? `<div class="reserve-bar" title="วันสงวนสิทธิ์สะสม ${item.reserveBefore} วัน" style="left:${reserveLeft}px;width:${Math.max(8, reserveWidth)}px"></div>`
-            : '';
-          return `
-            ${reserveBar}
-            <div class="planned-marker" title="กำหนดส่งเดิม ${isoDate(item.plannedEnd)}" style="left:${plannedLeft}px"></div>
-            <div class="planned-label" style="left:${plannedLeft}px">${formatShort(isoDate(item.plannedEnd))}</div>
-            <div class="adjusted-marker" title="กำหนดส่งใหม่ ${isoDate(item.adjustedDue)}" style="left:${adjustedLeft}px"></div>
-            <div class="adjusted-label" style="left:${adjustedLeft}px">${formatShort(isoDate(item.adjustedDue))}</div>`;
-        })();
-        const torDays = torDaysForPeriod(item.period);
-        const torVariance = torVarianceStatus(item.consultantCum, torDays);
-        const varianceClass = item.timing === 'estimate' ? 'forecast' : torVariance.cls;
-        const leftCells = isQuarter
-          ? `
-              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
-              <div class="period-cell">${periodRangeText(item)}</div>
-              <div class="period-cell"><span class="timing-pill ${varianceClass}">${torVariance.text}</span></div>`
-          : `
-              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
-              <div class="period-cell number">${item.consultant}</div>
-              <div class="period-cell number">${item.consultantCum}</div>
-              <div class="period-cell number">${item.aot}</div>
-              <div class="period-cell number">${item.aotCum}</div>
-              <div class="period-cell">${item.earliestStart ? formatShort(isoDate(item.earliestStart)) : '-'}</div>
-              <div class="period-cell">${item.consultantEnd ? formatShort(isoDate(item.consultantEnd)) : '-'}</div>
-              <div class="period-cell">${item.plannedEnd ? formatShort(isoDate(item.plannedEnd)) : '-'}</div>
-              <div class="period-cell" title="บวกวันสงวนสิทธิ์ ${item.reserveBefore} วัน">${item.adjustedDue ? formatShort(isoDate(item.adjustedDue)) : '-'}</div>
-              <div class="period-cell"><span class="timing-pill ${item.timing}">${item.timing === 'actual' ? 'Actual' : 'Estimate'}</span></div>`;
-        html += `
-          <div class="gantt-row">
-            <div class="cell-grid">
-              ${leftCells}
-            </div>
-            <div class="timeline" style="width:${timelineWidth}px">
-              ${todayLeft !== null ? `<div class="today-line" style="left:${todayLeft}px"></div>` : ''}
-              ${segments}
-              ${plannedLayer}
-              ${markers}
-            </div>
-          </div>`;
-      });
-      board.innerHTML = html;
-      board.style.setProperty('--timeline-width', `${timelineWidth}px`);
-      if (todayLeft !== null) {
-        const line = document.createElement('div');
-        line.className = 'today-chart-line';
-        line.title = `วันนี้ ${formatShort(isoDate(today))}`;
-        line.style.left = `${labelWidth + todayLeft}px`;
-        board.appendChild(line);
-      }
-      renderEditor();
-      requestAnimationFrame(updateSliderBounds);
-    }
-    function updateSliderBounds() {
-      const maxScroll = Math.max(0, workspace.scrollWidth - workspace.clientWidth);
-      timelineSlider.max = String(Math.ceil(maxScroll));
-      timelineSlider.value = String(Math.min(workspace.scrollLeft, maxScroll));
-      timelineSlider.disabled = maxScroll === 0;
-    }
-    function syncSliderToScroll() {
-      timelineSlider.value = String(Math.min(workspace.scrollLeft, Number(timelineSlider.max) || 0));
-    }
-    function updateRow(target) {
-      const rowIndex = Number(target.dataset.row);
-      const field = target.dataset.field;
-      if (Number.isNaN(rowIndex) || !field) return;
-      const before = { ...rows[rowIndex] };
-      if (field === 'duration') {
-        const oldDuration = Math.max(1, Number(before.duration) || 1);
-        const newDuration = Math.max(1, Number(target.value) || 1);
-        rows[rowIndex][field] = newDuration;
-        shiftRowsFrom(rowIndex + 1, newDuration - oldDuration);
-      } else if (field === 'start') {
-        const oldStart = parseDate(before.start);
-        const newStart = parseDate(target.value);
-        rows[rowIndex][field] = target.value;
-        if (oldStart && newStart) {
-          const deltaDays = diffDays(oldStart, newStart);
-          rows[rowIndex].meeting = shiftDateValue(rows[rowIndex].meeting, deltaDays);
-          shiftRowsFrom(rowIndex + 1, deltaDays);
-        }
-      } else {
-        rows[rowIndex][field] = target.value;
-      }
-      if (field === 'type') {
-        rows[rowIndex].org = target.value === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
-      }
-      render();
-    }
-    function updateRow(target) {
-      const rowIndex = Number(target.dataset.row);
-      const field = target.dataset.field;
-      if (Number.isNaN(rowIndex) || !field || !rows[rowIndex]) return;
-      pushUndo();
-
-      const row = rows[rowIndex];
-      const oldStart = parseDate(row.start);
-      const oldEnd = endDate(row);
-
-      if (field === 'duration') {
-        row.duration = Math.max(1, Math.round(Number(target.value) || 1));
-        syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
-        normalizeSequentialRows(rowIndex + 1);
-      } else if (field === 'end') {
-        const start = parseDate(row.start);
-        const newEnd = parseDate(target.value);
-        if (start && newEnd) {
-          row.duration = Math.max(1, diffDays(start, newEnd) + 1);
-          syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
-          normalizeSequentialRows(rowIndex + 1);
-        }
-      } else if (field === 'start') {
-        const newStart = parseDate(target.value);
-        row.start = target.value;
-        if (oldStart && newStart) {
-          const deltaDays = diffDays(oldStart, newStart);
-          row.meeting = shiftDateValue(row.meeting, deltaDays);
-        }
-        normalizeSequentialRows(rowIndex + 1);
-      } else if (field === 'type') {
-        row.type = target.value === 'AOT' ? 'AOT' : 'Consultant';
-        row.org = row.type === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
-      } else {
-        row[field] = target.value;
-      }
-
-      render();
-    }
-    board.addEventListener('input', event => {
-      const field = event.target.dataset.field;
-      if (!field || ['start', 'meeting', 'type'].includes(field)) return;
-      updateRow(event.target);
-    });
-    board.addEventListener('change', event => updateRow(event.target));
-    editor.addEventListener('input', event => {
-      if (event.target.dataset.field !== 'duration') return;
-      clearTimeout(durationEditTimer);
-      const target = event.target;
-      durationEditTimer = setTimeout(() => updateRow(target), 250);
-    });
-    editor.addEventListener('change', event => updateRow(event.target));
-    editor.addEventListener('click', event => {
-      if (event.target.dataset.action === 'undo') {
-        undoLastChange();
-        return;
-      }
-      const selected = editor.querySelector('#revisionPeriod');
-      if (!selected || !selected.value) return;
-      if (event.target.id === 'addRevisionRound') addRevisionRound(selected.value);
-      if (event.target.id === 'removeRevisionRound') removeLatestRevisionRound(selected.value);
-    });
-    scale.addEventListener('change', () => {
-      render();
-      if (Number(scale.value) === 90) {
-        requestAnimationFrame(() => {
-          workspace.scrollTo({ left: 0, behavior: 'auto' });
-          updateSliderBounds();
-        });
-      }
-    });
-    document.getElementById('toolbarAddRevisionRound').addEventListener('click', () => {
-      const selected = document.getElementById('toolbarRevisionPeriod');
-      if (selected && selected.value) addRevisionRound(selected.value);
-    });
-    document.getElementById('toolbarRemoveRevisionRound').addEventListener('click', () => {
-      const selected = document.getElementById('toolbarRevisionPeriod');
-      if (selected && selected.value) removeLatestRevisionRound(selected.value);
-    });
-    document.getElementById('undoBtn').addEventListener('click', undoLastChange);
-    document.getElementById('addRow').addEventListener('click', () => {
-      pushUndo();
-      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(referenceDate()), duration: 7, meeting: '', status: 'Draft' });
-      normalizeSequentialRows(rows.length - 1);
-      render();
-    });
-    function saveHtmlFile() {
-      saveRows();
-      const rowsJson = JSON.stringify(rows, null, 6);
-      const snapshotKey = `cra-auto-gantt-web-v3-${Date.now()}`;
-      let html = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
-      html = html.replace(/const defaultRows = \[[\s\S]*?\n    \];/, `const defaultRows = ${rowsJson};`);
-      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v\d+[^']*';/, `const storageKey = '${snapshotKey}';`);
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `CRA_Auto_Gantt_${isoDate(todayDate())}.html`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(link.href);
-    }
-    document.getElementById('saveHtmlBtn').addEventListener('click', saveHtmlFile);
-    referenceDateInput.addEventListener('change', () => {
-      localStorage.setItem(referenceDateStorageKey, referenceDateInput.value || isoDate(todayDate()));
-      render();
-    });
-    function scrollTimeline(direction) {
-      const distance = Math.round(workspace.clientWidth * 0.72);
-      workspace.scrollBy({ left: direction * distance, behavior: 'smooth' });
-    }
-    document.getElementById('scrollStart').addEventListener('click', () => workspace.scrollTo({ left: 0, behavior: 'smooth' }));
-    document.getElementById('scrollLeft').addEventListener('click', () => scrollTimeline(-1));
-    document.getElementById('scrollRight').addEventListener('click', () => scrollTimeline(1));
-    document.getElementById('scrollEnd').addEventListener('click', () => workspace.scrollTo({ left: workspace.scrollWidth, behavior: 'smooth' }));
-    timelineSlider.addEventListener('input', () => {
-      workspace.scrollTo({ left: Number(timelineSlider.value) || 0, behavior: 'auto' });
-    });
-    workspace.addEventListener('scroll', syncSliderToScroll, { passive: true });
-    window.addEventListener('resize', updateSliderBounds);
-    document.getElementById('printBtn').addEventListener('click', () => {
-      const previousScale = scale.value;
-      document.body.classList.add('pdf-print');
-      scale.value = '90';
-      render();
-      workspace.scrollTo({ left: 0, top: 0, behavior: 'auto' });
-      const restoreAfterPrint = () => {
-        document.body.classList.remove('pdf-print');
-        scale.value = previousScale;
-        render();
-        window.removeEventListener('afterprint', restoreAfterPrint);
-      };
-      window.addEventListener('afterprint', restoreAfterPrint);
-      requestAnimationFrame(() => window.print());
-    });
-    setupReferenceDate();
-    render();
-  </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CRA Auto Gantt</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #101827;
+      --muted: #5f6878;
+      --line: #d9dee8;
+      --soft-line: #edf0f5;
+      --consultant: #56a6f6;
+      --consultant-stroke: #1f6fbd;
+      --consultant-estimate: #acd8fb;
+      --aot: #f8d84c;
+      --aot-stroke: #c9960b;
+      --aot-estimate: #fff0a3;
+      --meeting: #e63f3f;
+      --planned: #16a34a;
+      --adjusted: #7c3aed;
+      --reserve: #c4b5fd;
+      --today: #111827;
+      --header: #202a3a;
+      --row: 86px;
+      --label: 1124px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      font-size: 15px;
+    }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+    }
+    header {
+      padding: 18px 24px 14px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+    .sub {
+      margin-top: 5px;
+      max-width: 660px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    button, select {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 11px;
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+      font-weight: 620;
+    }
+    button.primary {
+      background: #1f6fbd;
+      border-color: #1f6fbd;
+      color: #fff;
+    }
+    button.danger {
+      background: #fff1f2;
+      border-color: #f43f5e;
+      color: #be123c;
+    }
+    button.quiet {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+    .toolbar-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px;
+      border: 1px solid #dbe3ee;
+      border-radius: 9px;
+      background: #f8fafc;
+    }
+    .revision-tools {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+    .revision-period { min-width: 190px; }
+    .reference-date-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .reference-date-control input {
+      height: 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 8px;
+      font: inherit;
+      min-width: 138px;
+    }
+    #scrollStart, #scrollLeft, #scrollRight, #scrollEnd {
+      min-width: 38px;
+      padding: 0 9px;
+      font-size: 17px;
+      line-height: 1;
+    }
+    .scroll-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: min(460px, 100%);
+    }
+    .timeline-slider {
+      width: clamp(160px, 24vw, 320px);
+      accent-color: #1f6fbd;
+      cursor: pointer;
+    }
+    .sticky-tools {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(16, 24, 39, .05);
+    }
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 10px 24px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+    .scroll-dock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 24px 10px;
+      background: #fff;
+      border-top: 1px solid var(--soft-line);
+    }
+    .key { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .swatch { width: 24px; height: 12px; border-radius: 3px; border: 1px solid; }
+    .swatch.consultant { background: var(--consultant); border-color: var(--consultant-stroke); }
+    .swatch.aot { background: var(--aot); border-color: var(--aot-stroke); }
+    .swatch.reserve { background: var(--reserve); border-color: var(--adjusted); }
+    .diamond {
+      width: 12px;
+      height: 12px;
+      background: var(--meeting);
+      transform: rotate(45deg);
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .diamond.planned { background: var(--planned); }
+    .diamond.adjusted { background: var(--adjusted); }
+    .timing-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      border: 1px solid;
+    }
+    .timing-dot.actual { background: #2563eb; border-color: #1d4ed8; }
+    .timing-dot.estimate { background: #bfdbfe; border-color: #60a5fa; border-style: dashed; }
+    .workspace {
+      overflow: auto;
+      padding: 18px 24px 28px;
+    }
+    .summary {
+      position: sticky;
+      left: 24px;
+      z-index: 6;
+      width: calc(100vw - 48px);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+      min-width: 760px;
+    }
+    .metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+    }
+    .metric b { display: block; font-size: 19px; margin-bottom: 3px; line-height: 1.18; }
+    .metric span { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
+    .metric.good { border-color: #22c55e; }
+    .metric.early { border-color: #0ea5e9; }
+    .metric.late { border-color: #ef4444; }
+    .period-summary { display: none; }
+    .period-summary-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+    .period-summary h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+    .period-summary-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .period-summary table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .period-summary th,
+    .period-summary td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--soft-line);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .period-summary th:first-child,
+    .period-summary td:first-child { text-align: left; }
+    .period-summary tr:last-child td { border-bottom: 0; }
+    .contract-summary {
+      position: sticky;
+      left: 24px;
+      z-index: 4;
+      width: calc(100vw - 48px);
+      min-width: 760px;
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+    }
+    .contract-summary-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+    .contract-summary h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+    .contract-summary-note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .contract-summary table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .contract-summary th,
+    .contract-summary td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--soft-line);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .contract-summary th:first-child,
+    .contract-summary td:first-child,
+    .contract-summary th:nth-child(2),
+    .contract-summary td:nth-child(2) {
+      text-align: left;
+    }
+    .contract-summary tr:last-child td { border-bottom: 0; }
+    .contract-summary .late { color: #b91c1c; font-weight: 750; }
+    .contract-summary .early { color: #075985; font-weight: 750; }
+    .contract-summary .good { color: #166534; font-weight: 750; }
+    .timing-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      height: 28px;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid;
+    }
+    .timing-pill.actual { background: #dbeafe; border-color: #60a5fa; color: #1e40af; }
+    .timing-pill.estimate { background: #fef9c3; border-color: #facc15; color: #854d0e; }
+    .timing-pill.good { background: #dcfce7; border-color: #22c55e; color: #166534; }
+    .timing-pill.early { background: #e0f2fe; border-color: #38bdf8; color: #075985; }
+    .timing-pill.late { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+    .timing-pill.forecast {
+      background: #ffedd5;
+      border-color: #f97316;
+      color: #9a3412;
+    }
+    .board {
+      width: calc(var(--label) + var(--timeline-width, 980px));
+      min-width: 1540px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: visible;
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+    }
+    :root.quarter-scale {
+      --label: 556px;
+    }
+    :root.quarter-scale .board {
+      min-width: 0;
+    }
+    :root.quarter-scale .left-head,
+    :root.quarter-scale .cell-grid {
+      grid-template-columns: 206px 190px 160px;
+    }
+    :root.quarter-scale .left-head > div,
+    :root.quarter-scale .cell-grid > div {
+      display: block;
+    }
+    :root.quarter-scale .month-label,
+    :root.quarter-scale .meeting-label {
+      display: none;
+    }
+    :root.quarter-scale .week-label {
+      top: 28px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .gantt-head, .gantt-row, .section-row {
+      display: grid;
+      grid-template-columns: var(--label) var(--timeline-width, 980px);
+      width: 100%;
+    }
+    .left-head {
+      background: var(--header);
+      color: #fff;
+      border-right: 1px solid #111827;
+      display: grid;
+      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
+      align-items: center;
+      min-height: 84px;
+      position: sticky;
+      left: 0;
+      z-index: 24;
+    }
+    .left-head > div, .cell-grid > div {
+      padding: 9px 10px;
+      min-width: 0;
+    }
+    .left-head > div:nth-child(n+11) { display: none; }
+    .left-head > div { border-right: 1px solid rgba(255,255,255,.14); }
+    .cell-grid > div { border-right: 1px solid var(--soft-line); }
+    .timeline-head {
+      position: relative;
+      min-height: 84px;
+      background-color: #fbfcff;
+      background-image: repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px));
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .month-label {
+      position: absolute;
+      top: 10px;
+      height: 20px;
+      padding-left: 6px;
+      color: #334155;
+      font-size: 13px;
+      border-left: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .week-label {
+      position: absolute;
+      top: 46px;
+      height: 22px;
+      padding-left: 4px;
+      color: #64748b;
+      font-size: 12px;
+      border-left: 1px solid var(--soft-line);
+      white-space: nowrap;
+    }
+    .section-row {
+      height: 32px;
+      background: #eef3f8;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-title {
+      position: sticky;
+      left: 0;
+      z-index: 22;
+      background: #eef3f8;
+      padding: 7px 12px;
+      font-weight: 720;
+      color: #0f172a;
+      border-right: 1px solid var(--line);
+    }
+    .section-timeline {
+      background-color: #eef3f8;
+      background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .72) 0, rgba(203, 213, 225, .72) 1px, transparent 1px, transparent var(--week-width, 112px));
+      overflow: hidden;
+    }
+    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
+    .cell-grid {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
+      align-items: center;
+      border-right: 1px solid var(--line);
+    }
+    .cell-grid input, .cell-grid select {
+      width: 100%;
+      height: 28px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      padding: 0 5px;
+      color: var(--ink);
+      font: inherit;
+      min-width: 0;
+    }
+    .period-cell {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .period-cell.number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .cell-grid input:hover, .cell-grid input:focus,
+    .cell-grid select:hover, .cell-grid select:focus {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      outline: none;
+    }
+    .type-pill {
+      height: 24px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .type-pill.consultant { background: #dceefe; color: #155ba1; }
+    .type-pill.aot { background: #fff4b8; color: #8a6100; }
+    .end-date {
+      color: #334155;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .timeline {
+      position: relative;
+      z-index: 1;
+      min-height: var(--row);
+      overflow: hidden;
+      background-color: #fff;
+      background-image:
+        repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px)),
+        linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0));
+      background-size: auto, 100% 100%;
+    }
+    .bar {
+      position: absolute;
+      top: 13px;
+      height: 22px;
+      border-radius: 4px;
+      border: 1px solid;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.08);
+    }
+    .bar.consultant.actual { background: var(--consultant); border-color: var(--consultant-stroke); }
+    .bar.aot.actual { background: var(--aot); border-color: var(--aot-stroke); }
+    .bar.consultant.estimate {
+      background: var(--consultant-estimate);
+      border-color: var(--consultant-stroke);
+      border-style: dashed;
+    }
+    .bar.aot.estimate {
+      background: var(--aot-estimate);
+      border-color: var(--aot-stroke);
+      border-style: dashed;
+    }
+    .reserve-bar {
+      position: absolute;
+      top: 55px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(196, 181, 253, .72);
+      border: 1px solid rgba(124, 58, 237, .72);
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
+      z-index: 2;
+    }
+    .planned-marker,
+    .adjusted-marker {
+      position: absolute;
+      top: 50px;
+      width: 15px;
+      height: 15px;
+      margin-left: -7px;
+      border: 2px solid #fff;
+      transform: rotate(45deg);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .planned-marker {
+      background: var(--planned);
+      outline: 1px solid rgba(21, 128, 61, .65);
+    }
+    .adjusted-marker {
+      background: var(--adjusted);
+      outline: 1px solid rgba(91, 33, 182, .65);
+    }
+    .planned-label,
+    .adjusted-label {
+      display: none;
+    }
+    .planned-label { color: #15803d; }
+    .adjusted-label { color: #6d28d9; }
+    .today-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      margin-left: -1px;
+      background: var(--today);
+      opacity: .42;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .timeline-head .today-line { opacity: .62; }
+    .today-chart-line {
+      display: none;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      margin-left: -1px;
+      background: var(--today);
+      opacity: .7;
+      z-index: 18;
+      pointer-events: none;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.75);
+    }
+    .today-label {
+      position: absolute;
+      top: 72px;
+      transform: translateX(-50%);
+      color: var(--today);
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .meeting-marker {
+      position: absolute;
+      top: 15px;
+      width: 16px;
+      height: 16px;
+      margin-left: -8px;
+      background: var(--meeting);
+      border: 2px solid #fff;
+      outline: 1px solid rgba(145, 25, 25, .6);
+      transform: rotate(45deg);
+      border-radius: 3px;
+      z-index: 5;
+    }
+    .meeting-label {
+      position: absolute;
+      top: 37px;
+      transform: translateX(-50%);
+      color: #b91c1c;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 5;
+    }
+    .editor-panel {
+      position: sticky;
+      left: 24px;
+      z-index: 5;
+      width: calc(100vw - 48px);
+      min-width: 980px;
+      margin-top: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+    }
+    .editor-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+    .editor-head h2 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .editor-actions select,
+    .editor-actions button {
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      padding: 0 9px;
+      font: inherit;
+      font-size: 13px;
+    }
+    .editor-actions button {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .editor-actions button.danger {
+      border-color: #f43f5e;
+      background: #fff1f2;
+      color: #be123c;
+    }
+    .editor-meta {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .editor-table-wrap { overflow-x: auto; }
+    .editor-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 14px;
+    }
+    .editor-table th,
+    .editor-table td {
+      border-bottom: 1px solid var(--soft-line);
+      border-right: 1px solid var(--soft-line);
+      padding: 8px 9px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .editor-table th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+    .editor-table td:last-child,
+    .editor-table th:last-child { border-right: 0; }
+    .editor-table tr.current-work-row td {
+      background: #fff7ed;
+      box-shadow: inset 4px 0 0 #f97316;
+    }
+    .editor-table tr.current-work-row input,
+    .editor-table tr.current-work-row select {
+      border-color: #fb923c;
+      background: #fffaf5;
+    }
+    .editor-table tr:last-child td { border-bottom: 0; }
+    .editor-table input,
+    .editor-table select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      padding: 0 8px;
+      color: var(--ink);
+      font: inherit;
+      min-width: 0;
+    }
+    .editor-table input[type="number"] {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .editor-table .number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .editor-period {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 650;
+    }
+    @media (max-width: 760px) {
+      header { flex-direction: column; }
+      .toolbar { justify-content: flex-start; }
+      .scroll-dock { align-items: flex-start; flex-direction: column; }
+      .workspace { padding: 12px; }
+      .summary, .period-summary, .contract-summary, .editor-panel {
+        left: 12px;
+        width: calc(100vw - 24px);
+      }
+      .summary { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+    }
+    @media print {
+      @page { size: A4 landscape; margin: 8mm; }
+      :root { --row: 52px; }
+      body { background: #fff; }
+      html, body { width: 297mm; height: 210mm; overflow: hidden; }
+      .app { display: block; min-height: 0; }
+      header {
+        position: static;
+        box-shadow: none;
+        padding: 0 0 5px;
+        border-bottom: 0;
+      }
+      header h1 { font-size: 16px; margin-bottom: 2px; }
+      header .sub { font-size: 9px; }
+      .toolbar, .scroll-dock, .editor-panel { display: none !important; }
+      .sticky-tools {
+        position: static;
+        box-shadow: none;
+        border-bottom: 0;
+        padding: 0 0 5px;
+      }
+      .legend {
+        padding: 0;
+        gap: 6px 9px;
+        font-size: 8px;
+      }
+      .swatch { width: 16px; height: 8px; }
+      .diamond, .timing-dot { width: 8px; height: 8px; }
+      .workspace { overflow: visible; padding: 0; }
+      .summary {
+        position: static;
+        left: auto;
+        width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        margin-bottom: 6px;
+      }
+      .metric {
+        border-radius: 4px;
+        padding: 5px 6px;
+      }
+      .metric b { font-size: 10px; line-height: 1.15; }
+      .metric span { font-size: 8px; line-height: 1.2; }
+      .bar,
+      .swatch,
+      .diamond,
+      .timing-dot,
+      .reserve-bar,
+      .planned-marker,
+      .adjusted-marker,
+      .meeting-marker,
+      .timing-pill {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .board {
+        box-shadow: none;
+        border-radius: 0;
+        transform: scale(.82);
+        transform-origin: top left;
+      }
+      .contract-summary {
+        position: static;
+        left: auto;
+        width: 100%;
+        min-width: 0;
+        margin-top: -4px;
+        border-radius: 4px;
+        box-shadow: none;
+      }
+      .contract-summary-head {
+        padding: 5px 6px;
+      }
+      .contract-summary h2 { font-size: 10px; }
+      .contract-summary-note { font-size: 8px; }
+      .contract-summary table { font-size: 8px; }
+      .contract-summary th,
+      .contract-summary td {
+        padding: 3px 5px;
+      }
+      .left-head, .timeline-head { min-height: 56px; }
+      .left-head > div, .cell-grid > div { padding: 6px 7px; font-size: 10px; }
+      .week-label { top: 22px; font-size: 9px; }
+      .today-label { font-size: 8px; }
+      .today-chart-line,
+      .today-line {
+        display: block;
+        background: transparent !important;
+        border-left: 2px solid #111827;
+        width: 0;
+        opacity: 1;
+        box-shadow: none;
+      }
+      .timeline-head .today-line {
+        border-left-width: 2px;
+        opacity: 1;
+      }
+      .bar { top: 8px; height: 16px; }
+      .reserve-bar { top: 35px; height: 8px; }
+      .planned-marker, .adjusted-marker { top: 31px; width: 11px; height: 11px; }
+      .meeting-marker { top: 9px; width: 11px; height: 11px; }
+      button, select.range, input[type="range"] { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>CRA Auto Gantt - Consultant vs AOT Review</h1>
+        <div class="sub">แก้ไขวันที่จากตารางปรับวันที่ด้านล่าง กราฟจะคำนวณวันสิ้นสุด จำนวนวัน และเลื่อนช่วงงานถัดไปอัตโนมัติ พร้อม marker วันประชุมตรวจรับ</div>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-group revision-tools" aria-label="จัดการรอบแก้ไข">
+          <select id="toolbarRevisionPeriod" class="revision-period" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข"></select>
+          <button id="toolbarAddRevisionRound" class="primary" type="button">เพิ่มรอบแก้ไข</button>
+          <button id="toolbarRemoveRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
+        </div>
+        <div class="toolbar-group file-tools" aria-label="จัดการข้อมูล">
+          <label class="reference-date-control">ข้อมูล ณ วันที่ <input id="referenceDate" type="date"></label>
+          <button id="undoBtn" class="quiet" type="button" disabled>Undo</button>
+          <button id="addRow" class="quiet" type="button">เพิ่มแถวเปล่า</button>
+          <button id="saveHtmlBtn" class="primary" type="button">Save HTML</button>
+          <button id="printBtn" class="primary" type="button">Save as PDF</button>
+        </div>
+      </div>
+    </header>
+    <div class="sticky-tools">
+      <div class="legend">
+        <span class="key"><span class="diamond planned"></span>กำหนดส่งเดิม</span>
+        <span class="key"><span class="swatch reserve"></span>วันสงวนสิทธิ์สะสม</span>
+        <span class="key"><span class="diamond adjusted"></span>กำหนดส่งใหม่</span>
+        <span class="key"><span class="swatch consultant"></span>ที่ปรึกษา ทำงาน/แก้ไข/ส่งงาน</span>
+        <span class="key"><span class="swatch aot"></span>ทอท. พิจารณา/ตรวจรับ</span>
+        <span class="key"><span class="diamond"></span>วันประชุมคณะกรรมการตรวจรับ</span>
+        <span class="key"><span class="timing-dot actual"></span>Actual ก่อนวันนี้</span>
+        <span class="key"><span class="timing-dot estimate"></span>Estimate ตั้งแต่วันนี้เป็นต้นไป</span>
+      </div>
+      <div class="scroll-dock">
+        <select id="scale" class="range" title="ช่วงเวลา">
+          <option value="7">รายสัปดาห์</option>
+          <option value="14">ทุก 2 สัปดาห์</option>
+          <option value="30">รายเดือน</option>
+          <option value="90" selected>รายไตรมาส</option>
+        </select>
+        <div class="scroll-controls" aria-label="เลื่อนซ้ายขวา">
+          <button id="scrollStart" type="button" title="ไปซ้ายสุด">&laquo;</button>
+          <button id="scrollLeft" type="button" title="เลื่อนไปซ้าย">&lsaquo;</button>
+          <input id="timelineSlider" class="timeline-slider" type="range" min="0" value="0" step="1" aria-label="เลื่อนซ้ายขวา">
+          <button id="scrollRight" type="button" title="เลื่อนไปขวา">&rsaquo;</button>
+          <button id="scrollEnd" type="button" title="ไปขวาสุด">&raquo;</button>
+        </div>
+      </div>
+    </div>
+    <main class="workspace">
+      <section class="summary" id="summary"></section>
+      <section class="board" id="board"></section>
+      <section class="contract-summary" id="contractSummary"></section>
+      <section class="editor-panel" id="editor"></section>
+    </main>
+  </div>
+
+  <script>
+    const defaultRows = [
+      { period: 'งวด 1 Inception', org: 'ที่ปรึกษา', item: 'ส่งงาน', type: 'Consultant', start: '2025-08-22', duration: 29, meeting: '2025-09-25', status: 'Actual' },
+      { period: 'งวด 1 Inception', org: 'ทอท.', item: 'ตรวจรับ/ประชุม', type: 'AOT', start: '2025-09-20', duration: 1, meeting: '2025-09-25', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2025-09-20', duration: 41, meeting: '', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2025-10-31', duration: 25, meeting: '2025-11-17', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2025-11-25', duration: 52, meeting: '', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-01-16', duration: 41, meeting: '2026-02-17', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-02-26', duration: 2, meeting: '', status: 'Actual' },
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-02-28', duration: 1, meeting: '2026-03-05', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-02-28', duration: 26, meeting: '', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-03-26', duration: 29, meeting: '2026-04-10', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-04-24', duration: 7, meeting: '', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-05-01', duration: 28, meeting: '2026-05-21', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-05-29', duration: 15, meeting: '', status: 'Actual' },
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-06-13', duration: 1, meeting: '2026-06-23', status: 'Actual' },
+      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-06-13', duration: 18, meeting: '', status: 'Estimate' },
+      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-07-01', duration: 30, meeting: '', status: 'Estimate' },
+      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-07-31', duration: 14, meeting: '', status: 'Estimate' },
+      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-08-14', duration: 1, meeting: '', status: 'Estimate' },
+      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-08-14', duration: 51, meeting: '', status: 'Estimate' },
+      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-10-04', duration: 45, meeting: '', status: 'Estimate' },
+      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-11-18', duration: 21, meeting: '', status: 'Estimate' },
+      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-12-09', duration: 1, meeting: '', status: 'Estimate' },
+      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-12-09', duration: 16, meeting: '', status: 'Estimate' },
+      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-12-25', duration: 30, meeting: '', status: 'Estimate' },
+      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-01-24', duration: 9, meeting: '', status: 'Estimate' },
+      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-02-02', duration: 1, meeting: '', status: 'Estimate' },
+      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2027-02-02', duration: 46, meeting: '', status: 'Estimate' },
+      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2027-03-20', duration: 45, meeting: '', status: 'Estimate' },
+      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-05-04', duration: 14, meeting: '', status: 'Estimate' },
+      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-05-18', duration: 1, meeting: '', status: 'Estimate' }
+    ];
+
+    const board = document.getElementById('board');
+    const editor = document.getElementById('editor');
+    const summary = document.getElementById('summary');
+    const contractSummary = document.getElementById('contractSummary');
+    const workspace = document.querySelector('.workspace');
+    const timelineSlider = document.getElementById('timelineSlider');
+    const scale = document.getElementById('scale');
+    const referenceDateInput = document.getElementById('referenceDate');
+    const storageKey = 'cra-auto-gantt-web-v4';
+    const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
+    const undoLimit = 10;
+    const TOR_CONSULTANT_DAYS = 365;
+    const TOR_CUMULATIVE_DAYS_BY_PERIOD = {
+      1: 30,
+      2: 60,
+      3: 120,
+      4: 180,
+      5: 270,
+      6: 300,
+      7: 365
+    };
+    const plannedEndByPeriod = {
+      1: '2025-09-20',
+      2: '2025-10-20',
+      3: '2025-12-19',
+      4: '2026-02-17',
+      5: '2026-05-18',
+      6: '2026-06-17',
+      7: '2026-08-21'
+    };
+    let rows = loadRows();
+    let undoStack = [];
+    let durationEditTimer = null;
+    removeAccidentalDevelopmentRounds();
+    alignRowsAfterPass();
+
+    function loadRows() {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? JSON.parse(saved) : structuredClone(defaultRows);
+      } catch (_) {
+        return structuredClone(defaultRows);
+      }
+    }
+    function saveRows() { localStorage.setItem(storageKey, JSON.stringify(rows)); }
+    function cloneRows() { return structuredClone(rows); }
+    function pushUndo() {
+      undoStack.push(cloneRows());
+      if (undoStack.length > undoLimit) undoStack.shift();
+      updateUndoButtons();
+    }
+    function updateUndoButtons() {
+      document.querySelectorAll('[data-action="undo"], #undoBtn').forEach(button => {
+        button.disabled = undoStack.length === 0;
+        button.textContent = undoStack.length ? `Undo (${undoStack.length})` : 'Undo';
+      });
+    }
+    function undoLastChange() {
+      if (!undoStack.length) return;
+      rows = undoStack.pop();
+      render();
+    }
+    function revisionRoundNumber(row) {
+      const match = String(row.item || '').match(/รอบ\s*(\d+)/);
+      return match ? Number(match[1]) : 0;
+    }
+    function removeAccidentalDevelopmentRounds() {
+      const firstRemoveIndex = rows.findIndex(row => row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row)));
+      if (firstRemoveIndex < 0) return;
+      rows = rows.filter(row => !(row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row))));
+      normalizeSequentialRows(firstRemoveIndex);
+    }
+    const TH_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const BANGKOK_TIME_ZONE = 'Asia/Bangkok';
+    function parseDate(value) {
+      if (!value) return null;
+      const parts = String(value).split('-').map(Number);
+      if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    function isoDate(date) {
+      if (!date) return '';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    function todayDate() {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: BANGKOK_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(new Date()).reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+      }, {});
+      return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
+    }
+    function setupReferenceDate() {
+      const saved = localStorage.getItem(referenceDateStorageKey);
+      referenceDateInput.value = saved || isoDate(todayDate());
+    }
+    function referenceDate() {
+      return parseDate(referenceDateInput.value) || todayDate();
+    }
+    function addDays(date, days) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+    }
+    function dateOrdinal(date) {
+      return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+    }
+    function diffDays(a, b) {
+      return dateOrdinal(b) - dateOrdinal(a);
+    }
+    function shiftDateValue(value, deltaDays) {
+      const date = parseDate(value);
+      return date && deltaDays ? isoDate(addDays(date, deltaDays)) : value;
+    }
+    function shiftRowsFrom(startIndex, deltaDays) {
+      if (!deltaDays) return;
+      for (let i = startIndex; i < rows.length; i += 1) {
+        rows[i].start = shiftDateValue(rows[i].start, deltaDays);
+        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
+      }
+    }
+    function formatShort(value) {
+      const date = parseDate(value);
+      if (!date) return '';
+      const day = String(date.getDate()).padStart(2, '0');
+      const year = String(date.getFullYear() + 543).slice(-2);
+      return `${day} ${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
+    }
+    function formatMonthYear(date) {
+      const year = String(date.getFullYear() + 543).slice(-2);
+      return `${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
+    }
+    function endDate(row) {
+      const start = parseDate(row.start);
+      const duration = durationValue(row);
+      return start ? addDays(start, duration - 1) : null;
+    }
+    function durationValue(row) {
+      return Math.max(1, Math.round(Number(row.duration) || 1));
+    }
+    function periodNumber(period) {
+      const match = String(period || '').match(/\d+/);
+      return match ? Number(match[0]) : null;
+    }
+    function isAotOneDayHandoff(row) {
+      return row.type === 'AOT' && durationValue(row) === 1;
+    }
+    function isAotPassRow(row) {
+      return row.type === 'AOT' && String(row.item || '').includes('ผ่าน');
+    }
+    function isAotExcludedFromWork(row) {
+      return isAotOneDayHandoff(row) || isAotPassRow(row);
+    }
+    function sequencingAnchorIndex(rowIndex) {
+      for (let i = rowIndex - 1; i >= 0; i -= 1) {
+        if (!isAotPassRow(rows[i])) return i;
+      }
+      return -1;
+    }
+    function normalizeSequentialRows(startIndex = 1) {
+      for (let i = Math.max(1, startIndex); i < rows.length; i += 1) {
+        const anchorIndex = sequencingAnchorIndex(i);
+        const previousEnd = anchorIndex >= 0 ? endDate(rows[anchorIndex]) : null;
+        if (!previousEnd) continue;
+        const nextStart = addDays(previousEnd, 1);
+        const nextStartValue = isoDate(nextStart);
+        if (rows[i].start === nextStartValue) continue;
+        const oldStart = parseDate(rows[i].start);
+        const deltaDays = oldStart ? diffDays(oldStart, nextStart) : 0;
+        rows[i].start = nextStartValue;
+        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
+      }
+    }
+    function alignRowsAfterPass() {
+      for (let i = 0; i < rows.length - 1; i += 1) {
+        const passRow = rows[i];
+        const nextRow = rows[i + 1];
+        if (!isAotPassRow(passRow) || nextRow.type !== 'Consultant' || nextRow.period === passRow.period) continue;
+        if (!passRow.start || nextRow.start === passRow.start) continue;
+        const oldStart = parseDate(nextRow.start);
+        const newStart = parseDate(passRow.start);
+        const deltaDays = oldStart && newStart ? diffDays(oldStart, newStart) : 0;
+        nextRow.start = passRow.start;
+        nextRow.meeting = shiftDateValue(nextRow.meeting, deltaDays);
+        normalizeSequentialRows(i + 2);
+      }
+    }
+    function syncMeetingWhenEndMoves(row, oldEnd, newEnd) {
+      const meeting = parseDate(row.meeting);
+      if (meeting && oldEnd && newEnd && diffDays(meeting, oldEnd) === 0) {
+        row.meeting = isoDate(newEnd);
+      }
+    }
+    function rowTiming(row, today) {
+      const end = endDate(row);
+      return end && end < today ? 'actual' : 'estimate';
+    }
+    function torStatus(delta) {
+      if (delta > 0) return { text: `ช้ากว่า TOR ${delta} วัน`, cls: 'late' };
+      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early' };
+      return { text: 'ตรงตาม TOR', cls: 'good' };
+    }
+    function torDaysForPeriod(period) {
+      return TOR_CUMULATIVE_DAYS_BY_PERIOD[periodNumber(period)] || TOR_CONSULTANT_DAYS;
+    }
+    function torVarianceStatus(actualDays, torDays) {
+      const delta = actualDays - torDays;
+      if (delta > 0) return { text: `ล่าช้า ${delta} วัน`, cls: 'late', delta };
+      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early', delta };
+      return { text: 'ตรงตาม TOR', cls: 'good', delta };
+    }
+    function periodRangeText(item) {
+      if (!item.consultantStart || !item.consultantEnd) return '-';
+      return `${formatShort(isoDate(item.consultantStart))} - ${formatShort(isoDate(item.consultantEnd))}`;
+    }
+    function consultantDaysThrough(today) {
+      return rows
+        .filter(row => row.type === 'Consultant')
+        .reduce((sum, row) => {
+          const start = parseDate(row.start);
+          const end = endDate(row);
+          if (!start || !end || start > today) return sum;
+          const countedEnd = end > today ? today : end;
+          return sum + Math.max(0, diffDays(start, countedEnd) + 1);
+        }, 0);
+    }
+    function currentPeriodStats(periods, today) {
+      const activeRow = rows.find(row => {
+        const start = parseDate(row.start);
+        const end = endDate(row);
+        return start && end && start <= today && today <= end;
+      });
+      if (activeRow) return periods.find(item => item.period === activeRow.period) || periods[0] || null;
+      return periods.find(item => item.earliestStart && today < item.earliestStart)
+        || periods.find(item => item.adjustedDue && today <= item.adjustedDue)
+        || periods[periods.length - 1]
+        || null;
+    }
+    function dueStatus(adjustedDue, today) {
+      if (!adjustedDue) return { text: 'ยังไม่พบกำหนดส่งใหม่', cls: '' };
+      const daysToDue = diffDays(today, adjustedDue);
+      if (daysToDue < 0) return { text: `ปัจจุบันล่าช้า ${Math.abs(daysToDue)} วัน`, cls: 'late' };
+      if (daysToDue > 0) return { text: `เหลือเวลา ${daysToDue} วันก่อนถึงกำหนด`, cls: 'good' };
+      return { text: 'ครบกำหนดส่งวันนี้', cls: 'early' };
+    }
+    function periodStats(today) {
+      const stats = [];
+      const byPeriod = new Map();
+      rows.forEach(row => {
+        if (!byPeriod.has(row.period)) {
+          byPeriod.set(row.period, {
+            period: row.period,
+            rows: [],
+            consultant: 0,
+            consultantCum: 0,
+            aot: 0,
+            aotCum: 0,
+            reserveBefore: 0,
+            aotOneDay: 0,
+            earliestStart: null,
+            latestEnd: null,
+            consultantStart: null,
+            consultantEnd: null,
+            plannedEnd: null,
+            adjustedDue: null,
+            meetingDates: [],
+            timing: 'actual'
+          });
+          stats.push(byPeriod.get(row.period));
+        }
+        const item = byPeriod.get(row.period);
+        item.rows.push(row);
+        const duration = durationValue(row);
+        if (row.type === 'Consultant') item.consultant += duration;
+        if (row.type === 'AOT') {
+          if (isAotExcludedFromWork(row)) {
+            item.aotOneDay += duration;
+          } else {
+            item.aot += duration;
+          }
+        }
+        const start = parseDate(row.start);
+        const end = endDate(row);
+        const meeting = parseDate(row.meeting);
+        if (start && (!item.earliestStart || start < item.earliestStart)) item.earliestStart = start;
+        if (end && (!item.latestEnd || end > item.latestEnd)) item.latestEnd = end;
+        if (row.type === 'Consultant') {
+          if (start && (!item.consultantStart || start < item.consultantStart)) item.consultantStart = start;
+          if (end) item.consultantEnd = end;
+        }
+        if (meeting) item.meetingDates.push(meeting);
+        if (rowTiming(row, today) === 'estimate') item.timing = 'estimate';
+      });
+      let consultantCum = 0;
+      let aotCum = 0;
+      stats.forEach(item => {
+        const plannedEnd = parseDate(plannedEndByPeriod[periodNumber(item.period)]);
+        item.reserveBefore = aotCum;
+        item.plannedEnd = plannedEnd;
+        item.adjustedDue = plannedEnd ? addDays(plannedEnd, item.reserveBefore) : null;
+        consultantCum += item.consultant;
+        aotCum += item.aot;
+        item.consultantCum = consultantCum;
+        item.aotCum = aotCum;
+      });
+      return stats;
+    }
+    function timelineBounds() {
+      const dates = [];
+      for (const row of rows) {
+        const s = parseDate(row.start);
+        const e = endDate(row);
+        const m = parseDate(row.meeting);
+        if (s) dates.push(s);
+        if (e) dates.push(e);
+        if (m) dates.push(m);
+      }
+      for (const item of periodStats(referenceDate())) {
+        if (item.plannedEnd) dates.push(item.plannedEnd);
+        if (item.adjustedDue) dates.push(item.adjustedDue);
+      }
+      const min = dates.length ? new Date(Math.min(...dates)) : new Date(2025, 7, 18);
+      const max = dates.length ? new Date(Math.max(...dates)) : new Date(2027, 4, 31);
+      min.setDate(min.getDate() - 7);
+      max.setDate(max.getDate() + 14);
+      return { min, max };
+    }
+    function position(date, min, total, width) {
+      return Math.max(0, Math.min(width, diffDays(min, date) / total * width));
+    }
+    function scalePxPerDay(step) {
+      if (step === 90) return 0.95;
+      if (step === 30) return 7;
+      if (step === 14) return 11;
+      return 16;
+    }
+    function minTimelineWidth(step) {
+      return step === 90 ? 620 : 980;
+    }
+    function nextTickDate(date, step) {
+      if (step === 90) return new Date(date.getFullYear(), date.getMonth() + 3, 1);
+      return addDays(date, step);
+    }
+    function escapeAttr(value) {
+      return String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+    }
+    function escapeText(value) {
+      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    }
+    function makeInput(rowIndex, field, type = 'text') {
+      const row = rows[rowIndex];
+      return `<input data-row="${rowIndex}" data-field="${field}" type="${type}" value="${escapeAttr(row[field] ?? '')}">`;
+    }
+    function makeTypeSelect(rowIndex) {
+      const value = rows[rowIndex].type === 'AOT' ? 'AOT' : 'Consultant';
+      return `
+        <select data-row="${rowIndex}" data-field="type" title="ประเภทงาน">
+          <option value="Consultant"${value === 'Consultant' ? ' selected' : ''}>Consultant</option>
+          <option value="AOT"${value === 'AOT' ? ' selected' : ''}>AOT</option>
+        </select>`;
+    }
+    function renderSummary() {
+      const today = referenceDate();
+      const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0);
+      const aotReview = rows
+        .filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r))
+        .reduce((sum, r) => sum + durationValue(r), 0);
+      const aotOneDay = rows.filter(isAotExcludedFromWork).reduce((sum, r) => sum + durationValue(r), 0);
+      const aotRaw = aotReview + aotOneDay;
+      const aot = aotReview;
+      const periods = periodStats(today);
+      const currentPeriod = currentPeriodStats(periods, today);
+      const consultantToDate = consultantDaysThrough(today);
+      const variance = consultant - TOR_CONSULTANT_DAYS;
+      const tor = torStatus(variance);
+      const currentTorDays = currentPeriod ? torDaysForPeriod(currentPeriod.period) : TOR_CONSULTANT_DAYS;
+      const currentTor = torVarianceStatus(consultantToDate, currentTorDays);
+      summary.innerHTML = `
+        <div class="metric"><b>ข้อมูล ณ วันที่ ${formatShort(isoDate(today))}</b><span>อยู่ระหว่างการส่งงาน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
+        <div class="metric ${currentTor.cls}"><b>${consultantToDate} / ${currentTorDays} วัน</b><span>จำนวนวันทำงานของ ทปษ. ณ ปัจจุบัน เทียบ TOR ${currentPeriod ? escapeText(currentPeriod.period) : ''}<br>${currentTor.text}</span></div>
+        <div class="metric"><b>${currentPeriod ? escapeText(currentPeriod.period) : '-'}: ${currentPeriod?.adjustedDue ? formatShort(isoDate(currentPeriod.adjustedDue)) : '-'}</b><span>กำหนดส่งงานใหม่ หลังรวมวันสงวนสิทธิ์</span></div>
+        <div class="metric ${tor.cls}"><b>${consultant} / ${TOR_CONSULTANT_DAYS} วัน</b><span>จำนวนวันทำงาน ทปษ. (คาดการณ์): ${tor.text}</span></div>
+        <div class="metric"><b>${aot} วัน</b><span>วันทำงาน ทอท. นับจริง / วันสงวนสิทธิ์สะสม<br>ไม่รวม ${aotOneDay} วันของรอบผ่าน/ส่งต่อ (รวมดิบ ${aotRaw})</span></div>
+      `;
+    }
+    function renderContractSummary() {
+      const today = referenceDate();
+      const rowsHtml = periodStats(today).map(item => {
+        const torDays = torDaysForPeriod(item.period);
+        const variance = torVarianceStatus(item.consultantCum, torDays);
+        return `
+          <tr>
+            <td>${escapeText(item.period)}</td>
+            <td>${periodRangeText(item)}</td>
+            <td>${item.consultant}</td>
+            <td>${item.consultantCum}</td>
+            <td>${torDays}</td>
+            <td class="${variance.cls}">${variance.text}</td>
+          </tr>`;
+      }).join('');
+      contractSummary.innerHTML = `
+        <div class="contract-summary-head">
+          <h2>สรุปวันทำงาน ทปษ. สะสม เทียบ TOR</h2>
+          <div class="contract-summary-note">Bottom line: วันทำงาน ทปษ. สะสมต้องไม่เกิน 365 วันตาม TOR</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>งวด</th>
+              <th>ช่วงวันทำงาน ทปษ.</th>
+              <th>วันทำงานรายงวด</th>
+              <th>Actual/Plan สะสม</th>
+              <th>TOR สะสม</th>
+              <th>ส่วนต่าง</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>`;
+    }
+    function renderEditor() {
+      const today = referenceDate();
+      const stats = periodStats(today);
+      const periodCount = stats.length;
+      const currentPeriod = currentPeriodStats(stats, today);
+      const periodOptions = stats.map(item => `<option value="${escapeAttr(item.period)}"${currentPeriod && currentPeriod.period === item.period ? ' selected' : ''}>${escapeText(item.period)}</option>`).join('');
+      const toolbarRevisionPeriod = document.getElementById('toolbarRevisionPeriod');
+      if (toolbarRevisionPeriod) toolbarRevisionPeriod.innerHTML = periodOptions;
+      const body = rows.map((row, index) => {
+        const end = endDate(row);
+        const rowStart = parseDate(row.start);
+        const isCurrentWorkRow = rowStart && end && today >= rowStart && today <= end;
+        const timing = rowTiming(row, today);
+        const typeValue = row.type === 'AOT' ? 'AOT' : 'Consultant';
+        return `
+          <tr class="${isCurrentWorkRow ? 'current-work-row' : ''}">
+            <td class="editor-period" title="${escapeAttr(row.period)}">${escapeText(row.period)}</td>
+            <td>${escapeText(row.org)}</td>
+            <td>${escapeText(row.item)}</td>
+            <td>
+              <select data-row="${index}" data-field="type" aria-label="ประเภทงาน">
+                <option value="Consultant"${typeValue === 'Consultant' ? ' selected' : ''}>Consultant</option>
+                <option value="AOT"${typeValue === 'AOT' ? ' selected' : ''}>AOT</option>
+              </select>
+            </td>
+            <td><input data-row="${index}" data-field="start" type="date" value="${escapeAttr(row.start || '')}" aria-label="วันเริ่ม"></td>
+            <td><input data-row="${index}" data-field="end" type="date" value="${end ? isoDate(end) : ''}" aria-label="วันสิ้นสุด"></td>
+            <td><input data-row="${index}" data-field="duration" type="number" min="1" step="1" value="${durationValue(row)}" aria-label="จำนวนวัน"></td>
+            <td><input data-row="${index}" data-field="meeting" type="date" value="${escapeAttr(row.meeting || '')}" aria-label="วันประชุมตรวจรับ"></td>
+            <td><span class="timing-pill ${timing}">${timing === 'actual' ? 'Actual' : 'Estimate'}</span></td>
+          </tr>`;
+      }).join('');
+      editor.innerHTML = `
+        <div class="editor-head">
+          <h2>ตารางปรับวันที่</h2>
+          <div class="editor-actions">
+            <button data-action="undo" class="quiet" type="button" disabled>Undo</button>
+            <select id="revisionPeriod" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข">${periodOptions}</select>
+            <button id="addRevisionRound" type="button">เพิ่มรอบแก้ไข</button>
+            <button id="removeRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
+            <div class="editor-meta">${periodCount} งวด / ${rows.length} ช่วงงาน</div>
+          </div>
+        </div>
+        <div class="editor-table-wrap">
+          <table class="editor-table">
+            <colgroup>
+              <col style="width: 220px">
+              <col style="width: 92px">
+              <col style="width: 190px">
+              <col style="width: 124px">
+              <col style="width: 142px">
+              <col style="width: 142px">
+              <col style="width: 96px">
+              <col style="width: 154px">
+              <col style="width: 110px">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>งวด</th>
+                <th>หน่วยงาน</th>
+                <th>รายการ</th>
+                <th>ประเภท</th>
+                <th>วันเริ่ม</th>
+                <th>วันสิ้นสุด</th>
+                <th class="number">จำนวนวัน</th>
+                <th>ประชุมตรวจรับ</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody>${body}</tbody>
+          </table>
+        </div>`;
+    }
+    function nextRevisionRound(period) {
+      return rows
+        .filter(row => row.period === period)
+        .map(row => String(row.item || '').match(/รอบ\s*(\d+)/))
+        .filter(Boolean)
+        .reduce((max, match) => Math.max(max, Number(match[1]) || 0), 0) + 1;
+    }
+    function addRevisionRound(period) {
+      const indexes = rows.map((row, index) => row.period === period ? index : -1).filter(index => index >= 0);
+      if (!indexes.length) return;
+      const insertAt = Math.max(...indexes) + 1;
+      const lastIndex = insertAt - 1;
+      const lastEnd = endDate(rows[lastIndex]) || referenceDate();
+      const round = nextRevisionRound(period);
+      const consultantDuration = 7;
+      const aotDuration = 14;
+      const consultantStart = addDays(lastEnd, 1);
+      const aotStart = addDays(consultantStart, consultantDuration);
+      rows.splice(insertAt, 0,
+        {
+          period,
+          org: 'ที่ปรึกษา',
+          item: `รอบ ${round}`,
+          type: 'Consultant',
+          start: isoDate(consultantStart),
+          duration: consultantDuration,
+          meeting: '',
+          status: 'Estimate'
+        },
+        {
+          period,
+          org: 'ทอท.',
+          item: `พิจารณา รอบ ${round}`,
+          type: 'AOT',
+          start: isoDate(aotStart),
+          duration: aotDuration,
+          meeting: '',
+          status: 'Estimate'
+        }
+      );
+      normalizeSequentialRows(insertAt + 2);
+      render();
+    }
+    function removeLatestRevisionRound(period) {
+      const rounds = rows
+        .filter(row => row.period === period)
+        .map(revisionRoundNumber)
+        .filter(round => round > 2);
+      if (!rounds.length) return;
+      const round = Math.max(...rounds);
+      const indexes = rows
+        .map((row, index) => row.period === period && revisionRoundNumber(row) === round && row.status !== 'Actual' ? index : -1)
+        .filter(index => index >= 0);
+      if (!indexes.length) return;
+      pushUndo();
+      const firstRemoveIndex = Math.min(...indexes);
+      rows = rows.filter((_, index) => !indexes.includes(index));
+      normalizeSequentialRows(firstRemoveIndex);
+      render();
+    }
+    function render() {
+      saveRows();
+      renderSummary();
+      renderContractSummary();
+      const step = Number(scale.value) || 7;
+      const isQuarter = step === 90;
+      document.documentElement.classList.toggle('quarter-scale', isQuarter);
+      const { min, max } = timelineBounds();
+      const totalDays = Math.max(1, diffDays(min, max));
+      const pxPerDay = scalePxPerDay(step);
+      const labelWidth = isQuarter ? 556 : 1124;
+      const isPdfPrint = document.body.classList.contains('pdf-print');
+      const targetBoardWidth = isPdfPrint ? 1280 : Math.max(0, window.innerWidth - 48);
+      const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
+      const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
+      const today = referenceDate();
+      const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
+      const ticks = [];
+      let cursor = new Date(min);
+      cursor.setHours(0,0,0,0);
+      while (cursor <= max) {
+        ticks.push(new Date(cursor));
+        cursor = nextTickDate(cursor, step);
+      }
+      const months = [];
+      let monthCursor = new Date(min.getFullYear(), min.getMonth(), 1);
+      while (monthCursor <= max) {
+        months.push(new Date(monthCursor));
+        monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
+      }
+      document.documentElement.style.setProperty('--week-width', `${step * pxPerDay}px`);
+      const leftHead = isQuarter
+        ? `<div>งวด</div><div>ช่วงวันทำงาน ทปษ.</div><div>ล่าช้าเทียบ TOR</div>`
+        : `<div>งวด</div><div>ทปษ.</div><div>ทปษ. สะสม</div><div>ทอท.</div><div>ทอท. สะสม/วันสงวน</div><div>วันเริ่ม</div><div>วันสิ้นสุด ทปษ.</div><div>กำหนดเดิม</div><div>กำหนดใหม่</div><div>สถานะ</div>
+            <div>งวด</div><div>ทปษ. (วัน)</div><div>ทอท. นับจริง</div><div>ทอท. ผ่าน/ส่งต่อ</div><div>วันเริ่ม</div><div>วันสิ้นสุด</div><div>ประชุมตรวจรับ</div><div>สถานะ</div>`;
+      let html = `
+        <div class="gantt-head">
+          <div class="left-head">
+            ${leftHead}
+          </div>
+          <div class="timeline-head" style="width:${timelineWidth}px">
+            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${formatMonthYear(m)}</div>`).join('')}
+            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? formatMonthYear(t) : t.getDate()}</div>`).join('')}
+            ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
+          </div>
+        </div>`;
+      periodStats(today).forEach(item => {
+        const meetingDates = item.meetingDates
+          .map(date => isoDate(date))
+          .filter((value, index, list) => list.indexOf(value) === index);
+        const meetingText = meetingDates.length ? `${meetingDates.length} จุด` : '-';
+        const segments = item.rows.map(row => {
+          const start = parseDate(row.start);
+          const end = endDate(row);
+          if (!start || !end) return '';
+          const left = position(start, min, totalDays, timelineWidth);
+          const right = position(addDays(end, 1), min, totalDays, timelineWidth);
+          const width = Math.max(4, right - left);
+          const cls = row.type === 'AOT' ? 'aot' : 'consultant';
+          const timing = rowTiming(row, today);
+          return `<div class="bar ${cls} ${timing}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)}: ${row.start} - ${isoDate(end)} (${timing === 'actual' ? 'Actual' : 'Estimate'})" style="left:${left}px;width:${width}px"></div>`;
+        }).join('');
+        const markers = meetingDates.map(value => {
+          const meeting = parseDate(value);
+          const meetLeft = meeting ? position(meeting, min, totalDays, timelineWidth) : null;
+          return meeting ? `<div class="meeting-marker" title="ประชุมตรวจรับ ${value}" style="left:${meetLeft}px"></div><div class="meeting-label" style="left:${meetLeft}px">${formatShort(value)}</div>` : '';
+        }).join('');
+        const plannedLayer = (() => {
+          if (!item.plannedEnd || !item.adjustedDue) return '';
+          const plannedLeft = position(item.plannedEnd, min, totalDays, timelineWidth);
+          const adjustedLeft = position(item.adjustedDue, min, totalDays, timelineWidth);
+          const reserveLeft = Math.min(plannedLeft, adjustedLeft);
+          const reserveWidth = Math.abs(adjustedLeft - plannedLeft);
+          const reserveBar = item.reserveBefore > 0
+            ? `<div class="reserve-bar" title="วันสงวนสิทธิ์สะสม ${item.reserveBefore} วัน" style="left:${reserveLeft}px;width:${Math.max(8, reserveWidth)}px"></div>`
+            : '';
+          return `
+            ${reserveBar}
+            <div class="planned-marker" title="กำหนดส่งเดิม ${isoDate(item.plannedEnd)}" style="left:${plannedLeft}px"></div>
+            <div class="planned-label" style="left:${plannedLeft}px">${formatShort(isoDate(item.plannedEnd))}</div>
+            <div class="adjusted-marker" title="กำหนดส่งใหม่ ${isoDate(item.adjustedDue)}" style="left:${adjustedLeft}px"></div>
+            <div class="adjusted-label" style="left:${adjustedLeft}px">${formatShort(isoDate(item.adjustedDue))}</div>`;
+        })();
+        const torDays = torDaysForPeriod(item.period);
+        const torVariance = torVarianceStatus(item.consultantCum, torDays);
+        const varianceClass = item.timing === 'estimate' ? 'forecast' : torVariance.cls;
+        const leftCells = isQuarter
+          ? `
+              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
+              <div class="period-cell">${periodRangeText(item)}</div>
+              <div class="period-cell"><span class="timing-pill ${varianceClass}">${torVariance.text}</span></div>`
+          : `
+              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
+              <div class="period-cell number">${item.consultant}</div>
+              <div class="period-cell number">${item.consultantCum}</div>
+              <div class="period-cell number">${item.aot}</div>
+              <div class="period-cell number">${item.aotCum}</div>
+              <div class="period-cell">${item.earliestStart ? formatShort(isoDate(item.earliestStart)) : '-'}</div>
+              <div class="period-cell">${item.consultantEnd ? formatShort(isoDate(item.consultantEnd)) : '-'}</div>
+              <div class="period-cell">${item.plannedEnd ? formatShort(isoDate(item.plannedEnd)) : '-'}</div>
+              <div class="period-cell" title="บวกวันสงวนสิทธิ์ ${item.reserveBefore} วัน">${item.adjustedDue ? formatShort(isoDate(item.adjustedDue)) : '-'}</div>
+              <div class="period-cell"><span class="timing-pill ${item.timing}">${item.timing === 'actual' ? 'Actual' : 'Estimate'}</span></div>`;
+        html += `
+          <div class="gantt-row">
+            <div class="cell-grid">
+              ${leftCells}
+            </div>
+            <div class="timeline" style="width:${timelineWidth}px">
+              ${todayLeft !== null ? `<div class="today-line" style="left:${todayLeft}px"></div>` : ''}
+              ${segments}
+              ${plannedLayer}
+              ${markers}
+            </div>
+          </div>`;
+      });
+      board.innerHTML = html;
+      board.style.setProperty('--timeline-width', `${timelineWidth}px`);
+      if (todayLeft !== null) {
+        const line = document.createElement('div');
+        line.className = 'today-chart-line';
+        line.title = `วันนี้ ${formatShort(isoDate(today))}`;
+        line.style.left = `${labelWidth + todayLeft}px`;
+        board.appendChild(line);
+      }
+      renderEditor();
+      requestAnimationFrame(updateSliderBounds);
+    }
+    function updateSliderBounds() {
+      const maxScroll = Math.max(0, workspace.scrollWidth - workspace.clientWidth);
+      timelineSlider.max = String(Math.ceil(maxScroll));
+      timelineSlider.value = String(Math.min(workspace.scrollLeft, maxScroll));
+      timelineSlider.disabled = maxScroll === 0;
+    }
+    function syncSliderToScroll() {
+      timelineSlider.value = String(Math.min(workspace.scrollLeft, Number(timelineSlider.max) || 0));
+    }
+    function updateRow(target) {
+      const rowIndex = Number(target.dataset.row);
+      const field = target.dataset.field;
+      if (Number.isNaN(rowIndex) || !field) return;
+      const before = { ...rows[rowIndex] };
+      if (field === 'duration') {
+        const oldDuration = Math.max(1, Number(before.duration) || 1);
+        const newDuration = Math.max(1, Number(target.value) || 1);
+        rows[rowIndex][field] = newDuration;
+        shiftRowsFrom(rowIndex + 1, newDuration - oldDuration);
+      } else if (field === 'start') {
+        const oldStart = parseDate(before.start);
+        const newStart = parseDate(target.value);
+        rows[rowIndex][field] = target.value;
+        if (oldStart && newStart) {
+          const deltaDays = diffDays(oldStart, newStart);
+          rows[rowIndex].meeting = shiftDateValue(rows[rowIndex].meeting, deltaDays);
+          shiftRowsFrom(rowIndex + 1, deltaDays);
+        }
+      } else {
+        rows[rowIndex][field] = target.value;
+      }
+      if (field === 'type') {
+        rows[rowIndex].org = target.value === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
+      }
+      render();
+    }
+    function updateRow(target) {
+      const rowIndex = Number(target.dataset.row);
+      const field = target.dataset.field;
+      if (Number.isNaN(rowIndex) || !field || !rows[rowIndex]) return;
+      pushUndo();
+
+      const row = rows[rowIndex];
+      const oldStart = parseDate(row.start);
+      const oldEnd = endDate(row);
+
+      if (field === 'duration') {
+        row.duration = Math.max(1, Math.round(Number(target.value) || 1));
+        syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
+        normalizeSequentialRows(rowIndex + 1);
+      } else if (field === 'end') {
+        const start = parseDate(row.start);
+        const newEnd = parseDate(target.value);
+        if (start && newEnd) {
+          row.duration = Math.max(1, diffDays(start, newEnd) + 1);
+          syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
+          normalizeSequentialRows(rowIndex + 1);
+        }
+      } else if (field === 'start') {
+        const newStart = parseDate(target.value);
+        row.start = target.value;
+        if (oldStart && newStart) {
+          const deltaDays = diffDays(oldStart, newStart);
+          row.meeting = shiftDateValue(row.meeting, deltaDays);
+        }
+        normalizeSequentialRows(rowIndex + 1);
+      } else if (field === 'type') {
+        row.type = target.value === 'AOT' ? 'AOT' : 'Consultant';
+        row.org = row.type === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
+      } else {
+        row[field] = target.value;
+      }
+
+      render();
+    }
+    board.addEventListener('input', event => {
+      const field = event.target.dataset.field;
+      if (!field || ['start', 'meeting', 'type'].includes(field)) return;
+      updateRow(event.target);
+    });
+    board.addEventListener('change', event => updateRow(event.target));
+    editor.addEventListener('input', event => {
+      if (event.target.dataset.field !== 'duration') return;
+      clearTimeout(durationEditTimer);
+      const target = event.target;
+      durationEditTimer = setTimeout(() => updateRow(target), 250);
+    });
+    editor.addEventListener('change', event => updateRow(event.target));
+    editor.addEventListener('click', event => {
+      if (event.target.dataset.action === 'undo') {
+        undoLastChange();
+        return;
+      }
+      const selected = editor.querySelector('#revisionPeriod');
+      if (!selected || !selected.value) return;
+      if (event.target.id === 'addRevisionRound') addRevisionRound(selected.value);
+      if (event.target.id === 'removeRevisionRound') removeLatestRevisionRound(selected.value);
+    });
+    scale.addEventListener('change', () => {
+      render();
+      if (Number(scale.value) === 90) {
+        requestAnimationFrame(() => {
+          workspace.scrollTo({ left: 0, behavior: 'auto' });
+          updateSliderBounds();
+        });
+      }
+    });
+    document.getElementById('toolbarAddRevisionRound').addEventListener('click', () => {
+      const selected = document.getElementById('toolbarRevisionPeriod');
+      if (selected && selected.value) addRevisionRound(selected.value);
+    });
+    document.getElementById('toolbarRemoveRevisionRound').addEventListener('click', () => {
+      const selected = document.getElementById('toolbarRevisionPeriod');
+      if (selected && selected.value) removeLatestRevisionRound(selected.value);
+    });
+    document.getElementById('undoBtn').addEventListener('click', undoLastChange);
+    document.getElementById('addRow').addEventListener('click', () => {
+      pushUndo();
+      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(referenceDate()), duration: 7, meeting: '', status: 'Draft' });
+      normalizeSequentialRows(rows.length - 1);
+      render();
+    });
+    function saveHtmlFile() {
+      saveRows();
+      const rowsJson = JSON.stringify(rows, null, 6);
+      const snapshotKey = `cra-auto-gantt-web-v4-${Date.now()}`;
+      let html = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
+      html = html.replace(/const defaultRows = \[[\s\S]*?\n    \];/, `const defaultRows = ${rowsJson};`);
+      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v\d+[^']*';/, `const storageKey = '${snapshotKey}';`);
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `CRA_Auto_Gantt_${isoDate(todayDate())}.html`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+    document.getElementById('saveHtmlBtn').addEventListener('click', saveHtmlFile);
+    referenceDateInput.addEventListener('change', () => {
+      localStorage.setItem(referenceDateStorageKey, referenceDateInput.value || isoDate(todayDate()));
+      render();
+    });
+    function scrollTimeline(direction) {
+      const distance = Math.round(workspace.clientWidth * 0.72);
+      workspace.scrollBy({ left: direction * distance, behavior: 'smooth' });
+    }
+    document.getElementById('scrollStart').addEventListener('click', () => workspace.scrollTo({ left: 0, behavior: 'smooth' }));
+    document.getElementById('scrollLeft').addEventListener('click', () => scrollTimeline(-1));
+    document.getElementById('scrollRight').addEventListener('click', () => scrollTimeline(1));
+    document.getElementById('scrollEnd').addEventListener('click', () => workspace.scrollTo({ left: workspace.scrollWidth, behavior: 'smooth' }));
+    timelineSlider.addEventListener('input', () => {
+      workspace.scrollTo({ left: Number(timelineSlider.value) || 0, behavior: 'auto' });
+    });
+    workspace.addEventListener('scroll', syncSliderToScroll, { passive: true });
+    window.addEventListener('resize', updateSliderBounds);
+    document.getElementById('printBtn').addEventListener('click', () => {
+      const previousScale = scale.value;
+      document.body.classList.add('pdf-print');
+      scale.value = '90';
+      render();
+      workspace.scrollTo({ left: 0, top: 0, behavior: 'auto' });
+      const restoreAfterPrint = () => {
+        document.body.classList.remove('pdf-print');
+        scale.value = previousScale;
+        render();
+        window.removeEventListener('afterprint', restoreAfterPrint);
+      };
+      window.addEventListener('afterprint', restoreAfterPrint);
+      requestAnimationFrame(() => window.print());
+    });
+    setupReferenceDate();
+    render();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
