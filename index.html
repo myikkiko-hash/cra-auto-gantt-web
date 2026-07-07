@@ -957,7 +957,7 @@
     const timelineSlider = document.getElementById('timelineSlider');
     const scale = document.getElementById('scale');
     const referenceDateInput = document.getElementById('referenceDate');
-    const storageKey = 'cra-auto-gantt-web-v2';
+    const storageKey = 'cra-auto-gantt-web-v3';
     const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
     const undoLimit = 10;
     const TOR_CONSULTANT_DAYS = 365;
@@ -1758,10 +1758,10 @@
     function saveHtmlFile() {
       saveRows();
       const rowsJson = JSON.stringify(rows, null, 6);
-      const snapshotKey = `cra-auto-gantt-web-v2-${Date.now()}`;
+      const snapshotKey = `cra-auto-gantt-web-v3-${Date.now()}`;
       let html = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
       html = html.replace(/const defaultRows = \[[\s\S]*?\n    \];/, `const defaultRows = ${rowsJson};`);
-      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v2[^']*';/, `const storageKey = '${snapshotKey}';`);
+      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v\d+[^']*';/, `const storageKey = '${snapshotKey}';`);
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
