@@ -999,6 +999,8 @@
       rows = rows.filter(row => !(row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row))));
       normalizeSequentialRows(firstRemoveIndex);
     }
+    const TH_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const BANGKOK_TIME_ZONE = 'Asia/Bangkok';
     function parseDate(value) {
       if (!value) return null;
       const parts = String(value).split('-').map(Number);
@@ -1013,17 +1015,25 @@
       return `${y}-${m}-${d}`;
     }
     function todayDate() {
-      const date = new Date();
-      date.setHours(0, 0, 0, 0);
-      return date;
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: BANGKOK_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(new Date()).reduce((acc, part) => {
+        acc[part.type] = part.value;
+        return acc;
+      }, {});
+      return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
     }
     function addDays(date, days) {
-      const next = new Date(date);
-      next.setDate(next.getDate() + days);
-      return next;
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+    }
+    function dateOrdinal(date) {
+      return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
     }
     function diffDays(a, b) {
-      return Math.round((b - a) / 86400000);
+      return dateOrdinal(b) - dateOrdinal(a);
     }
     function shiftDateValue(value, deltaDays) {
       const date = parseDate(value);
@@ -1039,7 +1049,13 @@
     function formatShort(value) {
       const date = parseDate(value);
       if (!date) return '';
-      return date.toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: '2-digit' });
+      const day = String(date.getDate()).padStart(2, '0');
+      const year = String(date.getFullYear() + 543).slice(-2);
+      return `${day} ${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
+    }
+    function formatMonthYear(date) {
+      const year = String(date.getFullYear() + 543).slice(-2);
+      return `${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
     }
     function endDate(row) {
       const start = parseDate(row.start);
@@ -1502,8 +1518,8 @@
             ${leftHead}
           </div>
           <div class="timeline-head" style="width:${timelineWidth}px">
-            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${m.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' })}</div>`).join('')}
-            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? t.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' }) : t.getDate()}</div>`).join('')}
+            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${formatMonthYear(m)}</div>`).join('')}
+            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? formatMonthYear(t) : t.getDate()}</div>`).join('')}
             ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
           </div>
         </div>`;
@@ -1706,7 +1722,7 @@
     document.getElementById('undoBtn').addEventListener('click', undoLastChange);
     document.getElementById('addRow').addEventListener('click', () => {
       pushUndo();
-      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(new Date()), duration: 7, meeting: '', status: 'Draft' });
+      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(todayDate()), duration: 7, meeting: '', status: 'Draft' });
       normalizeSequentialRows(rows.length - 1);
       render();
     });
