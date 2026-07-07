@@ -115,6 +115,25 @@
       border-color: #bfdbfe;
     }
     .revision-period { min-width: 190px; }
+    .reference-date-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .reference-date-control input {
+      height: 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 8px;
+      font: inherit;
+      min-width: 138px;
+    }
     #scrollStart, #scrollLeft, #scrollRight, #scrollEnd {
       min-width: 38px;
       padding: 0 9px;
@@ -853,6 +872,7 @@
           <button id="toolbarRemoveRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
         </div>
         <div class="toolbar-group file-tools" aria-label="จัดการข้อมูล">
+          <label class="reference-date-control">ข้อมูล ณ วันที่ <input id="referenceDate" type="date"></label>
           <button id="undoBtn" class="quiet" type="button" disabled>Undo</button>
           <button id="addRow" class="quiet" type="button">เพิ่มแถวเปล่า</button>
           <button id="saveHtmlBtn" class="primary" type="button">Save HTML</button>
@@ -936,7 +956,9 @@
     const workspace = document.querySelector('.workspace');
     const timelineSlider = document.getElementById('timelineSlider');
     const scale = document.getElementById('scale');
+    const referenceDateInput = document.getElementById('referenceDate');
     const storageKey = 'cra-auto-gantt-web-v2';
+    const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
     const undoLimit = 10;
     const TOR_CONSULTANT_DAYS = 365;
     const TOR_CUMULATIVE_DAYS_BY_PERIOD = {
@@ -1025,6 +1047,13 @@
         return acc;
       }, {});
       return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
+    }
+    function setupReferenceDate() {
+      const saved = localStorage.getItem(referenceDateStorageKey);
+      referenceDateInput.value = saved || isoDate(todayDate());
+    }
+    function referenceDate() {
+      return parseDate(referenceDateInput.value) || todayDate();
     }
     function addDays(date, days) {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
@@ -1242,7 +1271,7 @@
         if (e) dates.push(e);
         if (m) dates.push(m);
       }
-      for (const item of periodStats(todayDate())) {
+      for (const item of periodStats(referenceDate())) {
         if (item.plannedEnd) dates.push(item.plannedEnd);
         if (item.adjustedDue) dates.push(item.adjustedDue);
       }
@@ -1287,7 +1316,7 @@
         </select>`;
     }
     function renderSummary() {
-      const today = todayDate();
+      const today = referenceDate();
       const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0);
       const aotReview = rows
         .filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r))
@@ -1311,7 +1340,7 @@
       `;
     }
     function renderContractSummary() {
-      const today = todayDate();
+      const today = referenceDate();
       const rowsHtml = periodStats(today).map(item => {
         const torDays = torDaysForPeriod(item.period);
         const variance = torVarianceStatus(item.consultantCum, torDays);
@@ -1345,7 +1374,7 @@
         </table>`;
     }
     function renderEditor() {
-      const today = todayDate();
+      const today = referenceDate();
       const stats = periodStats(today);
       const periodCount = stats.length;
       const currentPeriod = currentPeriodStats(stats, today);
@@ -1429,7 +1458,7 @@
       if (!indexes.length) return;
       const insertAt = Math.max(...indexes) + 1;
       const lastIndex = insertAt - 1;
-      const lastEnd = endDate(rows[lastIndex]) || todayDate();
+      const lastEnd = endDate(rows[lastIndex]) || referenceDate();
       const round = nextRevisionRound(period);
       const consultantDuration = 7;
       const aotDuration = 14;
@@ -1492,7 +1521,7 @@
       const targetBoardWidth = isPdfPrint ? 1280 : Math.max(0, window.innerWidth - 48);
       const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
       const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
-      const today = todayDate();
+      const today = referenceDate();
       const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
       const ticks = [];
       let cursor = new Date(min);
@@ -1722,7 +1751,7 @@
     document.getElementById('undoBtn').addEventListener('click', undoLastChange);
     document.getElementById('addRow').addEventListener('click', () => {
       pushUndo();
-      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(todayDate()), duration: 7, meeting: '', status: 'Draft' });
+      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(referenceDate()), duration: 7, meeting: '', status: 'Draft' });
       normalizeSequentialRows(rows.length - 1);
       render();
     });
@@ -1743,6 +1772,10 @@
       URL.revokeObjectURL(link.href);
     }
     document.getElementById('saveHtmlBtn').addEventListener('click', saveHtmlFile);
+    referenceDateInput.addEventListener('change', () => {
+      localStorage.setItem(referenceDateStorageKey, referenceDateInput.value || isoDate(todayDate()));
+      render();
+    });
     function scrollTimeline(direction) {
       const distance = Math.round(workspace.clientWidth * 0.72);
       workspace.scrollBy({ left: direction * distance, behavior: 'smooth' });
@@ -1771,6 +1804,7 @@
       window.addEventListener('afterprint', restoreAfterPrint);
       requestAnimationFrame(() => window.print());
     });
+    setupReferenceDate();
     render();
   </script>
 </body>
