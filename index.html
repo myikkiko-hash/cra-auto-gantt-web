@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CRA Auto Gantt</title>
+  <title>CRA Project Timeline</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -183,7 +183,7 @@
     .swatch { width: 24px; height: 12px; border-radius: 3px; border: 1px solid; }
     .swatch.consultant { background: var(--consultant); border-color: var(--consultant-stroke); }
     .swatch.aot { background: var(--aot); border-color: var(--aot-stroke); }
-    .swatch.reserve { background: var(--reserve); border-color: var(--adjusted); }
+    .swatch.reserve { background: rgba(196, 181, 253, .45); border-color: rgba(124, 58, 237, .45); }
     .diamond {
       width: 12px;
       height: 12px;
@@ -310,7 +310,8 @@
     .contract-summary td:nth-child(2) {
       text-align: left;
     }
-    .contract-summary tr:last-child td { border-bottom: 0; }
+    .contract-summary tr:last-child td { border-bottom: 0; }
+    .contract-summary tr.current-period-summary td { background: rgba(250, 204, 21, .08); }
     .contract-summary .late { color: #b91c1c; font-weight: 750; }
     .contract-summary .early { color: #075985; font-weight: 750; }
     .contract-summary .good { color: #166534; font-weight: 750; }
@@ -442,7 +443,9 @@
       background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .72) 0, rgba(203, 213, 225, .72) 1px, transparent 1px, transparent var(--week-width, 112px));
       overflow: hidden;
     }
-    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
+    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
+    .gantt-row.current-period-row .cell-grid { background: #fffdf5; box-shadow: inset 4px 0 0 rgba(245, 158, 11, .32); }
+    .gantt-row.current-period-row .timeline { background-color: #fffdf7; }
     .cell-grid {
       position: sticky;
       left: 0;
@@ -534,8 +537,8 @@
       top: 55px;
       height: 12px;
       border-radius: 999px;
-      background: rgba(196, 181, 253, .72);
-      border: 1px solid rgba(124, 58, 237, .72);
+      background: rgba(196, 181, 253, .34);
+      border: 1px solid rgba(124, 58, 237, .36);
       box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
       z-index: 2;
     }
@@ -556,8 +559,8 @@
       outline: 1px solid rgba(21, 128, 61, .65);
     }
     .adjusted-marker {
-      background: var(--adjusted);
-      outline: 1px solid rgba(91, 33, 182, .65);
+      background: rgba(124, 58, 237, .68);
+      outline: 1px solid rgba(91, 33, 182, .38);
     }
     .planned-label,
     .adjusted-label {
@@ -862,7 +865,7 @@
   <div class="app">
     <header>
       <div>
-        <h1>CRA Auto Gantt - Consultant vs AOT Review</h1>
+        <h1>CRA Project Timeline</h1>
         <div class="sub">แก้ไขวันที่จากตารางปรับวันที่ด้านล่าง กราฟจะคำนวณวันสิ้นสุด จำนวนวัน และเลื่อนช่วงงานถัดไปอัตโนมัติ พร้อม marker วันประชุมตรวจรับ</div>
       </div>
       <div class="toolbar">
@@ -1341,11 +1344,14 @@
     }
     function renderContractSummary() {
       const today = referenceDate();
-      const rowsHtml = periodStats(today).map(item => {
+      const stats = periodStats(today);
+      const currentPeriod = currentPeriodStats(stats, today);
+      const rowsHtml = stats.map(item => {
         const torDays = torDaysForPeriod(item.period);
         const variance = torVarianceStatus(item.consultantCum, torDays);
+        const currentClass = currentPeriod && item.period === currentPeriod.period ? ' class="current-period-summary"' : '';
         return `
-          <tr>
+          <tr${currentClass}>
             <td>${escapeText(item.period)}</td>
             <td>${periodRangeText(item)}</td>
             <td>${item.consultant}</td>
@@ -1523,6 +1529,8 @@
       const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
       const today = referenceDate();
       const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
+      const renderPeriods = periodStats(today);
+      const currentPeriod = currentPeriodStats(renderPeriods, today);
       const ticks = [];
       let cursor = new Date(min);
       cursor.setHours(0,0,0,0);
@@ -1552,7 +1560,8 @@
             ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
           </div>
         </div>`;
-      periodStats(today).forEach(item => {
+      renderPeriods.forEach(item => {
+        const currentRowClass = currentPeriod && item.period === currentPeriod.period ? ' current-period-row' : '';
         const meetingDates = item.meetingDates
           .map(date => isoDate(date))
           .filter((value, index, list) => list.indexOf(value) === index);
@@ -1609,7 +1618,7 @@
               <div class="period-cell" title="บวกวันสงวนสิทธิ์ ${item.reserveBefore} วัน">${item.adjustedDue ? formatShort(isoDate(item.adjustedDue)) : '-'}</div>
               <div class="period-cell"><span class="timing-pill ${item.timing}">${item.timing === 'actual' ? 'Actual' : 'Estimate'}</span></div>`;
         html += `
-          <div class="gantt-row">
+          <div class="gantt-row${currentRowClass}">
             <div class="cell-grid">
               ${leftCells}
             </div>
