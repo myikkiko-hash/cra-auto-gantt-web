@@ -12,20 +12,20 @@
       --muted: #5f6878;
       --line: #d9dee8;
       --soft-line: #edf0f5;
-      --consultant: #56a6f6;
-      --consultant-stroke: #1f6fbd;
-      --consultant-estimate: #acd8fb;
-      --aot: #f8d84c;
-      --aot-stroke: #c9960b;
-      --aot-estimate: #fff0a3;
+      --consultant: #3b82f6;
+      --consultant-stroke: #1d4ed8;
+      --consultant-estimate: #a7f3d0;
+      --aot: #6ee7b7;
+      --aot-stroke: #059669;
+      --aot-estimate: #d1fae5;
       --meeting: #e63f3f;
-      --planned: #16a34a;
-      --adjusted: #7c3aed;
-      --reserve: #c4b5fd;
+      --planned: #10b981;
+      --adjusted: #8b5cf6;
+      --reserve: #ddd6fe;
       --today: #111827;
-      --header: #202a3a;
+      --header: #1e293b;
       --row: 86px;
-      --label: 1124px;
+      --label: 556px;
     }
     * { box-sizing: border-box; }
     body {
@@ -207,28 +207,54 @@
       overflow: auto;
       padding: 18px 24px 28px;
     }
-    .summary {
-      position: sticky;
-      left: 24px;
-      z-index: 6;
-      width: calc(100vw - 48px);
-      display: grid;
-      grid-template-columns: repeat(5, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-      min-width: 760px;
-    }
-    .metric {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 11px 12px;
-    }
-    .metric b { display: block; font-size: 19px; margin-bottom: 3px; line-height: 1.18; }
-    .metric span { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
-    .metric.good { border-color: #22c55e; }
-    .metric.early { border-color: #0ea5e9; }
-    .metric.late { border-color: #ef4444; }
+    .summary {
+
+      position: sticky;
+
+      left: 24px;
+
+      z-index: 6;
+
+      width: calc(100vw - 48px);
+
+      display: grid;
+
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+
+      gap: 8px;
+
+      margin-bottom: 12px;
+
+      min-width: 760px;
+
+    }
+
+    .metric {
+
+      background: #f4d9ea;
+
+      border: 1px solid #e4bad2;
+
+      border-radius: 3px;
+
+      padding: 8px 10px;
+
+      box-shadow: none;
+
+      min-height: 58px;
+
+    }
+
+    .metric b { display: block; font-size: 17px; margin-bottom: 3px; line-height: 1.15; }
+
+    .metric span { display: block; color: #5f4a5b; font-size: 12px; line-height: 1.3; }
+
+    .metric.good { background: #dff0e4; border-color: #a8d8b6; }
+
+    .metric.early { background: #dcecf8; border-color: #afd0eb; }
+
+    .metric.late { background: #fde2e1; border-color: #f4aaa8; }
+
     .period-summary { display: none; }
     .period-summary-head {
       display: flex;
@@ -315,6 +341,14 @@
     .contract-summary .late { color: #b91c1c; font-weight: 750; }
     .contract-summary .early { color: #075985; font-weight: 750; }
     .contract-summary .good { color: #166534; font-weight: 750; }
+    .contract-summary { border-radius: 3px; box-shadow: none; }
+
+    .contract-summary-head { background: #f8fbff; }
+
+    .contract-summary th { background: #e0f2fe; color: #0f172a; font-weight: 800; }
+
+    .contract-summary tbody tr:nth-child(even) td { background: #fbfdff; }
+
     .timing-pill {
       display: inline-flex;
       align-items: center;
@@ -380,7 +414,7 @@
       color: #fff;
       border-right: 1px solid #111827;
       display: grid;
-      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
+      grid-template-columns: 206px 190px 160px;
       align-items: center;
       min-height: 84px;
       position: sticky;
@@ -397,7 +431,7 @@
     .timeline-head {
       position: relative;
       min-height: 84px;
-      background-color: #fbfcff;
+      background-color: #f8fbff;
       background-image: repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px));
       border-bottom: 1px solid var(--line);
       overflow: hidden;
@@ -446,13 +480,79 @@
     .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
     .gantt-row.current-period-row .cell-grid { background: #fffdf5; box-shadow: inset 4px 0 0 rgba(245, 158, 11, .32); }
     .gantt-row.current-period-row .timeline { background-color: #fffdf7; }
+    .overview-row {
+
+      display: grid;
+
+      grid-template-columns: var(--label) var(--timeline-width, 980px);
+
+      min-height: 112px;
+
+      border-bottom: 1px solid var(--line);
+
+      background: #f8fbff;
+
+    }
+
+    .overview-label {
+
+      position: sticky;
+
+      left: 0;
+
+      z-index: 21;
+
+      background: #f8fbff;
+
+      border-right: 1px solid var(--line);
+
+      padding: 20px 18px;
+
+      color: #0f172a;
+
+    }
+
+    .overview-label b { display: block; font-size: 15px; margin-bottom: 5px; }
+
+    .overview-label span { color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+    .overview-timeline {
+
+      position: relative;
+
+      min-height: 112px;
+
+      overflow: hidden;
+
+      background-color: #f8fbff;
+
+      background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .62) 0, rgba(203, 213, 225, .62) 1px, transparent 1px, transparent var(--week-width, 112px));
+
+    }
+
+    .overview-track { position: absolute; top: 52px; height: 18px; border-radius: 999px; background: linear-gradient(90deg, #0f766e, #0ea5e9 45%, #2563eb); box-shadow: inset 0 -1px 0 rgba(15, 23, 42, .18); }
+
+    .overview-dot { position: absolute; top: 47px; width: 18px; height: 18px; margin-left: -9px; border: 2px solid #fff; border-radius: 5px; transform: rotate(45deg); background: #34d399; outline: 1px solid rgba(5, 150, 105, .55); z-index: 4; }
+
+    .overview-dot.current { background: #8b5cf6; outline-color: rgba(109, 40, 217, .55); }
+
+    .overview-dot.finish { background: #2563eb; outline-color: rgba(29, 78, 216, .55); }
+
+    .overview-note { position: absolute; top: 20px; transform: translateX(-50%); color: #334155; font-size: 11px; font-weight: 700; white-space: nowrap; text-align: center; z-index: 4; }
+
+    .overview-note.bottom { top: 76px; color: #64748b; font-weight: 600; }
+
+    .overview-today { position: absolute; top: 28px; bottom: 20px; width: 2px; margin-left: -1px; background: #ef4444; z-index: 3; }
+
+    .overview-today-label { position: absolute; top: 72px; transform: translateX(-50%); color: #b91c1c; font-size: 11px; font-weight: 800; white-space: nowrap; z-index: 4; }
+
     .cell-grid {
       position: sticky;
       left: 0;
       z-index: 20;
       background: #fff;
       display: grid;
-      grid-template-columns: 206px 72px 92px 72px 116px 100px 108px 116px 126px 116px;
+      grid-template-columns: 206px 190px 160px;
       align-items: center;
       border-right: 1px solid var(--line);
     }
@@ -625,6 +725,64 @@
       white-space: nowrap;
       z-index: 5;
     }
+
+    /* Prototype 2: integrated cool palette and continuous gantt bars */
+    .metric {
+      background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 48%, #dcfce7 100%);
+      border-color: #b7c9f4;
+      border-left: 5px solid #38bdf8;
+      color: #0f172a;
+    }
+    .metric:nth-child(2) { border-left-color: #8b5cf6; background: linear-gradient(135deg, #f3e8ff 0%, #e0f2fe 100%); }
+    .metric:nth-child(3) { border-left-color: #14b8a6; background: linear-gradient(135deg, #ccfbf1 0%, #e0f2fe 100%); }
+    .metric:nth-child(4) { border-left-color: #2563eb; background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%); }
+    .metric:nth-child(5) { border-left-color: #10b981; background: linear-gradient(135deg, #d1fae5 0%, #eef2ff 100%); }
+    .metric b { color: #0f172a; }
+    .metric span { color: #475569; }
+    .metric.good, .metric.early, .metric.late { border-top-color: #b7c9f4; border-right-color: #b7c9f4; border-bottom-color: #b7c9f4; }
+    .left-head { background: linear-gradient(90deg, #172554 0%, #164e63 50%, #115e59 100%); border-right-color: #0f172a; }
+    .timeline-head { background-color: #f8fbff; }
+    .overview-label { background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%); }
+    .overview-track { border-radius: 2px; height: 14px; top: 54px; background: linear-gradient(90deg, #22c55e 0%, #14b8a6 25%, #38bdf8 55%, #2563eb 78%, #7c3aed 100%); }
+    .overview-dot { width: 14px; height: 14px; margin-left: -7px; top: 50px; border-radius: 3px; }
+    .contract-summary-head { background: linear-gradient(90deg, #eef2ff 0%, #ecfeff 55%, #f0fdf4 100%); }
+    .contract-summary th { background: #dbeafe; color: #172554; border-bottom-color: #bfdbfe; }
+    .contract-summary th:nth-child(5), .contract-summary th:nth-child(6) { background: #ccfbf1; color: #134e4a; }
+    .contract-summary tbody tr:nth-child(even) td { background: #f8fbff; }
+    .contract-summary tr.current-period-summary td { background: rgba(167, 243, 208, .25); }
+    .bar { height: 18px; top: 15px; border-radius: 0; border-width: 0; box-shadow: none; }
+    .bar.consultant.actual { background: #3b82f6; }
+    .bar.aot.actual { background: #5eead4; }
+    .bar.consultant.estimate { background: #93c5fd; border: 1px dashed #2563eb; }
+    .bar.aot.estimate { background: #bbf7d0; border: 1px dashed #059669; }
+    .meeting-marker { top: 18px; width: 10px; height: 10px; margin-left: -5px; border-width: 1px; border-radius: 2px; outline-width: 1px; }
+    .meeting-label { top: 32px; font-size: 10px; color: #991b1b; }
+    .reserve-bar { border-radius: 0; height: 8px; top: 57px; background: rgba(139, 92, 246, .18); border-color: rgba(124, 58, 237, .28); }
+
+
+    /* Prototype 3: stronger bars and smaller acceptance markers */
+    .bar { height: 24px; top: 11px; border-radius: 0; border-width: 0; box-shadow: 0 1px 2px rgba(15, 23, 42, .16); }
+    .bar.consultant.actual { background: #2563eb; }
+    .bar.aot.actual { background: #2dd4bf; }
+    .bar.consultant.estimate { background: #60a5fa; border: 1px dashed #1d4ed8; }
+    .bar.aot.estimate { background: #86efac; border: 1px dashed #047857; }
+    .meeting-marker { top: 18px; width: 8px; height: 8px; margin-left: -4px; border-width: 1px; border-radius: 1px; outline-width: 1px; }
+    .meeting-label { top: 31px; font-size: 9px; }
+
+
+    /* Prototype 4: contract-extension styling on overview timeline */
+    .overview-track-main { border-radius: 2px 0 0 2px; background: linear-gradient(90deg, #22c55e 0%, #14b8a6 30%, #38bdf8 65%, #2563eb 100%); }
+    .overview-track-extension { border-radius: 0 2px 2px 0; background: rgba(139, 92, 246, .18); border: 1px dashed rgba(124, 58, 237, .62); box-shadow: none; }
+    .overview-today-marker { position: absolute; top: 70px; width: 0; height: 0; margin-left: -6px; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 11px solid #ef4444; filter: drop-shadow(0 0 1px rgba(185, 28, 28, .7)); z-index: 5; }
+
+
+    /* Prototype 5: rounded outer bar edges and smaller planned markers */
+    .bar.bar-start { border-radius: 8px 0 0 8px; }
+    .bar.bar-end { border-radius: 0 8px 8px 0; }
+    .bar.bar-start.bar-end { border-radius: 8px; }
+    .planned-marker,
+    .adjusted-marker { top: 56px; width: 10px; height: 10px; margin-left: -5px; border-width: 1px; border-radius: 2px; }
+
     .editor-panel {
       position: sticky;
       left: 24px;
@@ -1339,7 +1497,7 @@
         <div class="metric ${currentTor.cls}"><b>${consultantToDate} / ${currentTorDays} วัน</b><span>จำนวนวันทำงานของ ทปษ. ณ ปัจจุบัน เทียบ TOR ${currentPeriod ? escapeText(currentPeriod.period) : ''}<br>${currentTor.text}</span></div>
         <div class="metric"><b>${currentPeriod ? escapeText(currentPeriod.period) : '-'}: ${currentPeriod?.adjustedDue ? formatShort(isoDate(currentPeriod.adjustedDue)) : '-'}</b><span>กำหนดส่งงานใหม่ หลังรวมวันสงวนสิทธิ์</span></div>
         <div class="metric ${tor.cls}"><b>${consultant} / ${TOR_CONSULTANT_DAYS} วัน</b><span>จำนวนวันทำงาน ทปษ. (คาดการณ์): ${tor.text}</span></div>
-        <div class="metric"><b>${aot} วัน</b><span>วันทำงาน ทอท. นับจริง / วันสงวนสิทธิ์สะสม<br>ไม่รวม ${aotOneDay} วันของรอบผ่าน/ส่งต่อ (รวมดิบ ${aotRaw})</span></div>
+        <div class="metric"><b>${currentPeriod ? currentPeriod.reserveBefore : 0} วัน</b><span>วันสงวนสิทธิ์ถึงปัจจุบัน (realized)<br>นับถึงก่อน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
       `;
     }
     function renderContractSummary() {
@@ -1362,18 +1520,29 @@
       }).join('');
       contractSummary.innerHTML = `
         <div class="contract-summary-head">
-          <h2>สรุปวันทำงาน ทปษ. สะสม เทียบ TOR</h2>
+          <h2>สรุปวันทำงานสะสม เทียบ TOR</h2>
           <div class="contract-summary-note">Bottom line: วันทำงาน ทปษ. สะสมต้องไม่เกิน 365 วันตาม TOR</div>
         </div>
         <table>
           <thead>
-            <tr>
-              <th>งวด</th>
-              <th>ช่วงวันทำงาน ทปษ.</th>
-              <th>วันทำงานรายงวด</th>
-              <th>Actual/Plan สะสม</th>
-              <th>TOR สะสม</th>
-              <th>ส่วนต่าง</th>
+            <tr>
+
+              <th>งวด</th>
+
+              <th>ช่วงวันทำงาน ทปษ.</th>
+
+              <th>ทปษ. รายงวด</th>
+
+              <th>ทปษ. สะสม</th>
+
+              <th>ทอท. รายงวด</th>
+
+              <th>ทอท. สะสม</th>
+
+              <th>TOR สะสม</th>
+
+              <th>ส่วนต่าง</th>
+
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -1522,15 +1691,35 @@
       const { min, max } = timelineBounds();
       const totalDays = Math.max(1, diffDays(min, max));
       const pxPerDay = scalePxPerDay(step);
-      const labelWidth = isQuarter ? 556 : 1124;
+      const labelWidth = 556;
       const isPdfPrint = document.body.classList.contains('pdf-print');
       const targetBoardWidth = isPdfPrint ? 1280 : Math.max(0, window.innerWidth - 48);
       const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
       const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
       const today = referenceDate();
       const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
-      const renderPeriods = periodStats(today);
-      const currentPeriod = currentPeriodStats(renderPeriods, today);
+      const renderPeriods = periodStats(today);
+
+      const currentPeriod = currentPeriodStats(renderPeriods, today);
+
+      const overviewStart = renderPeriods[0]?.earliestStart || min;
+
+      const overviewEnd = renderPeriods[renderPeriods.length - 1]?.consultantEnd || max;
+
+      const overviewLeft = position(overviewStart, min, totalDays, timelineWidth);
+
+      const overviewRight = position(addDays(overviewEnd, 1), min, totalDays, timelineWidth);
+
+      const extensionStart = parseDate('2026-09-01');
+
+      const overviewSolidEnd = extensionStart && extensionStart < overviewEnd ? extensionStart : overviewEnd;
+
+      const overviewSolidRight = position(overviewSolidEnd, min, totalDays, timelineWidth);
+
+      const overviewExtensionLeft = Math.max(overviewSolidRight, overviewLeft);
+
+      const overviewExtensionWidth = Math.max(0, overviewRight - overviewExtensionLeft);
+
       const ticks = [];
       let cursor = new Date(min);
       cursor.setHours(0,0,0,0);
@@ -1545,28 +1734,55 @@
         monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
       }
       document.documentElement.style.setProperty('--week-width', `${step * pxPerDay}px`);
-      const leftHead = isQuarter
-        ? `<div>งวด</div><div>ช่วงวันทำงาน ทปษ.</div><div>ล่าช้าเทียบ TOR</div>`
-        : `<div>งวด</div><div>ทปษ.</div><div>ทปษ. สะสม</div><div>ทอท.</div><div>ทอท. สะสม/วันสงวน</div><div>วันเริ่ม</div><div>วันสิ้นสุด ทปษ.</div><div>กำหนดเดิม</div><div>กำหนดใหม่</div><div>สถานะ</div>
-            <div>งวด</div><div>ทปษ. (วัน)</div><div>ทอท. นับจริง</div><div>ทอท. ผ่าน/ส่งต่อ</div><div>วันเริ่ม</div><div>วันสิ้นสุด</div><div>ประชุมตรวจรับ</div><div>สถานะ</div>`;
-      let html = `
-        <div class="gantt-head">
-          <div class="left-head">
-            ${leftHead}
-          </div>
-          <div class="timeline-head" style="width:${timelineWidth}px">
-            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${formatMonthYear(m)}</div>`).join('')}
-            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? formatMonthYear(t) : t.getDate()}</div>`).join('')}
-            ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
-          </div>
-        </div>`;
+      const leftHead = `<div>งวด</div><div>ช่วงวันทำงาน ทปษ.</div><div>ล่าช้าเทียบ TOR</div>`;
+
+      let html = `
+
+        <div class="gantt-head">
+
+          <div class="left-head">
+
+            ${leftHead}
+
+          </div>
+
+          <div class="timeline-head" style="width:${timelineWidth}px">
+
+            ${months.map(m => `<div class="month-label" style="left:${position(m, min, totalDays, timelineWidth)}px">${formatMonthYear(m)}</div>`).join('')}
+
+            ${ticks.map(t => `<div class="week-label" style="left:${position(t, min, totalDays, timelineWidth)}px">${step === 90 ? formatMonthYear(t) : t.getDate()}</div>`).join('')}
+
+            ${todayLeft !== null ? `<div class="today-line" title="วันนี้ ${formatShort(isoDate(today))}" style="left:${todayLeft}px"></div><div class="today-label" style="left:${todayLeft}px">วันนี้</div>` : ''}
+
+          </div>
+
+        </div>
+
+        <div class="overview-row">
+
+          <div class="overview-label"><b>Project Overview</b><span>ภาพรวมโครงการ<br>${formatShort(isoDate(overviewStart))} - ${formatShort(isoDate(overviewEnd))}</span></div>
+
+          <div class="overview-timeline" style="width:${timelineWidth}px">
+
+            <div class="overview-track overview-track-main" style="left:${overviewLeft}px;width:${Math.max(24, overviewSolidRight - overviewLeft)}px"></div>
+
+            ${overviewExtensionWidth > 1 ? `<div class="overview-track overview-track-extension" style="left:${overviewExtensionLeft}px;width:${overviewExtensionWidth}px"></div>` : ''}
+
+            ${renderPeriods.map((item, index) => { const markerDate = item.consultantEnd || item.adjustedDue || item.plannedEnd; if (!markerDate) return ''; const left = position(markerDate, min, totalDays, timelineWidth); const cls = index === renderPeriods.length - 1 ? ' finish' : (currentPeriod && item.period === currentPeriod.period ? ' current' : ''); return '<div class="overview-note" style="left:' + left + 'px">' + escapeText(item.period) + '</div><div class="overview-dot' + cls + '" style="left:' + left + 'px"></div><div class="overview-note bottom" style="left:' + left + 'px">' + formatShort(isoDate(markerDate)) + '</div>'; }).join('')}
+
+            ${todayLeft !== null ? '<div class="overview-today" style="left:' + todayLeft + 'px"></div><div class="overview-today-marker" style="left:' + todayLeft + 'px"></div><div class="overview-today-label" style="left:' + todayLeft + 'px">วันนี้</div>' : ''}
+
+          </div>
+
+        </div>`;
+
       renderPeriods.forEach(item => {
         const currentRowClass = currentPeriod && item.period === currentPeriod.period ? ' current-period-row' : '';
         const meetingDates = item.meetingDates
           .map(date => isoDate(date))
           .filter((value, index, list) => list.indexOf(value) === index);
         const meetingText = meetingDates.length ? `${meetingDates.length} จุด` : '-';
-        const segments = item.rows.map(row => {
+        const segments = item.rows.map((row, rowIndex) => {
           const start = parseDate(row.start);
           const end = endDate(row);
           if (!start || !end) return '';
@@ -1574,8 +1790,10 @@
           const right = position(addDays(end, 1), min, totalDays, timelineWidth);
           const width = Math.max(4, right - left);
           const cls = row.type === 'AOT' ? 'aot' : 'consultant';
-          const timing = rowTiming(row, today);
-          return `<div class="bar ${cls} ${timing}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)}: ${row.start} - ${isoDate(end)} (${timing === 'actual' ? 'Actual' : 'Estimate'})" style="left:${left}px;width:${width}px"></div>`;
+          const timing = rowTiming(row, today);
+
+          const edgeClass = (rowIndex === 0 ? ' bar-start' : '') + (rowIndex === item.rows.length - 1 ? ' bar-end' : '');
+          return `<div class="bar ${cls} ${timing}${edgeClass}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)} | ${formatShort(row.start)} - ${formatShort(isoDate(end))} | ${durationValue(row)} วัน | ${timing === 'actual' ? 'Actual' : 'Estimate'}" style="left:${left}px;width:${width}px"></div>`;
         }).join('');
         const markers = meetingDates.map(value => {
           const meeting = parseDate(value);
@@ -1601,22 +1819,14 @@
         const torDays = torDaysForPeriod(item.period);
         const torVariance = torVarianceStatus(item.consultantCum, torDays);
         const varianceClass = item.timing === 'estimate' ? 'forecast' : torVariance.cls;
-        const leftCells = isQuarter
-          ? `
-              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
-              <div class="period-cell">${periodRangeText(item)}</div>
-              <div class="period-cell"><span class="timing-pill ${varianceClass}">${torVariance.text}</span></div>`
-          : `
-              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
-              <div class="period-cell number">${item.consultant}</div>
-              <div class="period-cell number">${item.consultantCum}</div>
-              <div class="period-cell number">${item.aot}</div>
-              <div class="period-cell number">${item.aotCum}</div>
-              <div class="period-cell">${item.earliestStart ? formatShort(isoDate(item.earliestStart)) : '-'}</div>
-              <div class="period-cell">${item.consultantEnd ? formatShort(isoDate(item.consultantEnd)) : '-'}</div>
-              <div class="period-cell">${item.plannedEnd ? formatShort(isoDate(item.plannedEnd)) : '-'}</div>
-              <div class="period-cell" title="บวกวันสงวนสิทธิ์ ${item.reserveBefore} วัน">${item.adjustedDue ? formatShort(isoDate(item.adjustedDue)) : '-'}</div>
-              <div class="period-cell"><span class="timing-pill ${item.timing}">${item.timing === 'actual' ? 'Actual' : 'Estimate'}</span></div>`;
+        const leftCells = `
+
+              <div class="period-cell"><b>${escapeText(item.period)}</b></div>
+
+              <div class="period-cell">${periodRangeText(item)}</div>
+
+              <div class="period-cell"><span class="timing-pill ${varianceClass}">${torVariance.text}</span></div>`;
+
         html += `
           <div class="gantt-row${currentRowClass}">
             <div class="cell-grid">
