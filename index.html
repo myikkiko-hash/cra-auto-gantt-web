@@ -914,8 +914,8 @@
       .summary { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
     }
     @media print {
-      @page { size: A4 landscape; margin: 8mm; }
-      :root { --row: 52px; }
+      @page { size: A4 landscape; margin: 5mm; }
+      :root { --row: 58px; }
       body { background: #fff; }
       html, body { width: 297mm; height: 210mm; overflow: hidden; }
       .app { display: block; min-height: 0; }
@@ -925,8 +925,8 @@
         padding: 0 0 5px;
         border-bottom: 0;
       }
-      header h1 { font-size: 16px; margin-bottom: 2px; }
-      header .sub { font-size: 9px; }
+      header h1 { font-size: 18px; margin-bottom: 3px; }
+      header .sub { font-size: 10px; }
       .toolbar, .scroll-dock, .editor-panel { display: none !important; }
       .sticky-tools {
         position: static;
@@ -940,7 +940,7 @@
         font-size: 8px;
       }
       .swatch { width: 16px; height: 8px; }
-      .diamond, .timing-dot { width: 8px; height: 8px; }
+      .diamond, .timing-dot { width: 9px; height: 9px; }
       .workspace { overflow: visible; padding: 0; }
       .summary {
         position: static;
@@ -972,7 +972,7 @@
       .board {
         box-shadow: none;
         border-radius: 0;
-        transform: scale(.82);
+        transform: scale(.98);
         transform-origin: top left;
       }
       .contract-summary {
@@ -980,7 +980,7 @@
         left: auto;
         width: 100%;
         min-width: 0;
-        margin-top: -4px;
+        margin-top: 2px;
         border-radius: 4px;
         box-shadow: none;
       }
@@ -992,12 +992,12 @@
       .contract-summary table { font-size: 8px; }
       .contract-summary th,
       .contract-summary td {
-        padding: 3px 5px;
+        padding: 4px 6px;
       }
       .left-head, .timeline-head { min-height: 56px; }
       .left-head > div, .cell-grid > div { padding: 6px 7px; font-size: 10px; }
       .week-label { top: 22px; font-size: 9px; }
-      .today-label { font-size: 8px; }
+      .today-label { font-size: 9px; }
       .today-chart-line,
       .today-line {
         display: block;
@@ -1011,10 +1011,33 @@
         border-left-width: 2px;
         opacity: 1;
       }
-      .bar { top: 8px; height: 16px; }
-      .reserve-bar { top: 35px; height: 8px; }
-      .planned-marker, .adjusted-marker { top: 31px; width: 11px; height: 11px; }
-      .meeting-marker { top: 9px; width: 11px; height: 11px; }
+      .bar { top: 7px; height: 19px; }
+      .reserve-bar { top: 37px; height: 8px; }
+      .planned-marker, .adjusted-marker { top: 36px; width: 9px; height: 9px; margin-left: -4px; }
+      .meeting-marker { top: 12px; width: 8px; height: 8px; }
+
+      /* PDF fit and readability override */
+      .legend { font-size: 9.5px; gap: 7px 10px; }
+      .swatch { width: 17px; height: 9px; }
+      .diamond, .timing-dot { width: 9px; height: 9px; }
+      .summary { gap: 5px; margin-bottom: 7px; }
+      .metric { padding: 6px 7px; }
+      .metric b { font-size: 12px; line-height: 1.15; }
+      .metric span { font-size: 9px; line-height: 1.25; }
+      .contract-summary-head { padding: 6px 7px; }
+      .contract-summary h2 { font-size: 12px; }
+      .contract-summary-note { font-size: 9px; }
+      .contract-summary table { font-size: 9.5px; }
+      .contract-summary th, .contract-summary td { padding: 4px 6px; }
+      .left-head, .timeline-head { min-height: 62px; }
+      .left-head > div, .cell-grid > div { padding: 7px 8px; font-size: 11px; }
+      .week-label { top: 24px; font-size: 10px; }
+      .today-label { font-size: 9px; }
+      .bar { top: 7px; height: 19px; }
+      .reserve-bar { top: 37px; height: 8px; }
+      .planned-marker, .adjusted-marker { top: 36px; width: 9px; height: 9px; margin-left: -4px; }
+      .meeting-marker { top: 12px; width: 8px; height: 8px; margin-left: -4px; }
+
       button, select.range, input[type="range"] { display: none; }
     }
   </style>
@@ -1765,7 +1788,7 @@
       const pxPerDay = scalePxPerDay(step);
       const labelWidth = 556;
       const isPdfPrint = document.body.classList.contains('pdf-print');
-      const targetBoardWidth = isPdfPrint ? 1280 : Math.max(0, window.innerWidth - 48);
+      const targetBoardWidth = isPdfPrint ? 1480 : Math.max(0, window.innerWidth - 48);
       const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
       const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
       const today = referenceDate();
