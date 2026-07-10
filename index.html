@@ -1,212 +1,421 @@
-<!doctype html>
-<html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!doctype html>
+
+<html lang="th">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>CRA Project Timeline</title>
-  <style>
-    :root {
-      --bg: #f6f7f9;
-      --panel: #ffffff;
-      --ink: #101827;
-      --muted: #5f6878;
-      --line: #d9dee8;
-      --soft-line: #edf0f5;
-      --consultant: #3b82f6;
-      --consultant-stroke: #1d4ed8;
-      --consultant-estimate: #a7f3d0;
-      --aot: #6ee7b7;
-      --aot-stroke: #059669;
-      --aot-estimate: #d1fae5;
-      --meeting: #e63f3f;
-      --planned: #10b981;
-      --adjusted: #8b5cf6;
-      --reserve: #ddd6fe;
-      --today: #111827;
-      --header: #1e293b;
-      --row: 86px;
-      --label: 556px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      font-size: 15px;
-    }
-    .app {
-      min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-    }
-    header {
-      padding: 18px 24px 14px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 720;
-      letter-spacing: 0;
-    }
-    .sub {
-      margin-top: 5px;
-      max-width: 660px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    .toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    button, select {
-      height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      padding: 0 11px;
-      font: inherit;
-    }
-    button {
-      cursor: pointer;
-      font-weight: 620;
-    }
-    button.primary {
-      background: #1f6fbd;
-      border-color: #1f6fbd;
-      color: #fff;
-    }
-    button.danger {
-      background: #fff1f2;
-      border-color: #f43f5e;
-      color: #be123c;
-    }
-    button.quiet {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      color: #334155;
-    }
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-    .toolbar-group {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px;
-      border: 1px solid #dbe3ee;
-      border-radius: 9px;
-      background: #f8fafc;
-    }
-    .revision-tools {
-      background: #eff6ff;
-      border-color: #bfdbfe;
-    }
-    .revision-period { min-width: 190px; }
-    .reference-date-control {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #334155;
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .reference-date-control input {
-      height: 34px;
-      border: 1px solid #cbd5e1;
-      border-radius: 7px;
-      background: #fff;
-      color: var(--ink);
-      padding: 0 8px;
-      font: inherit;
-      min-width: 138px;
-    }
-    #scrollStart, #scrollLeft, #scrollRight, #scrollEnd {
-      min-width: 38px;
-      padding: 0 9px;
-      font-size: 17px;
-      line-height: 1;
-    }
-    .scroll-controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-width: min(460px, 100%);
-    }
-    .timeline-slider {
-      width: clamp(160px, 24vw, 320px);
-      accent-color: #1f6fbd;
-      cursor: pointer;
-    }
-    .sticky-tools {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 8px 18px rgba(16, 24, 39, .05);
-    }
-    .legend {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 10px 24px;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 14px;
-      flex-wrap: wrap;
-    }
-    .scroll-dock {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 9px 24px 10px;
-      background: #fff;
-      border-top: 1px solid var(--soft-line);
-    }
-    .key { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
-    .swatch { width: 24px; height: 12px; border-radius: 3px; border: 1px solid; }
-    .swatch.consultant { background: var(--consultant); border-color: var(--consultant-stroke); }
-    .swatch.aot { background: var(--aot); border-color: var(--aot-stroke); }
+
+  <style>
+
+    :root {
+
+      --bg: #f6f7f9;
+
+      --panel: #ffffff;
+
+      --ink: #101827;
+
+      --muted: #5f6878;
+
+      --line: #d9dee8;
+
+      --soft-line: #edf0f5;
+
+      --consultant: #3b82f6;
+
+      --consultant-stroke: #1d4ed8;
+
+      --consultant-estimate: #a7f3d0;
+
+      --aot: #6ee7b7;
+
+      --aot-stroke: #059669;
+
+      --aot-estimate: #d1fae5;
+
+      --meeting: #e63f3f;
+
+      --planned: #10b981;
+
+      --adjusted: #8b5cf6;
+
+      --reserve: #ddd6fe;
+
+      --today: #111827;
+
+      --header: #1e293b;
+
+      --row: 86px;
+
+      --label: 556px;
+
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+
+      margin: 0;
+
+      background: var(--bg);
+
+      color: var(--ink);
+
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+
+      font-size: 15px;
+
+    }
+
+    .app {
+
+      min-height: 100vh;
+
+      display: grid;
+
+      grid-template-rows: auto auto 1fr;
+
+    }
+
+    header {
+
+      padding: 18px 24px 14px;
+
+      background: var(--panel);
+
+      border-bottom: 1px solid var(--line);
+
+      display: flex;
+
+      align-items: flex-start;
+
+      justify-content: space-between;
+
+      gap: 18px;
+
+    }
+
+    h1 {
+
+      margin: 0;
+
+      font-size: 22px;
+
+      font-weight: 720;
+
+      letter-spacing: 0;
+
+    }
+
+    .sub {
+
+      margin-top: 5px;
+
+      max-width: 660px;
+
+      color: var(--muted);
+
+      font-size: 14px;
+
+      line-height: 1.45;
+
+    }
+
+    .toolbar {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+
+      justify-content: flex-end;
+
+    }
+
+    button, select {
+
+      height: 34px;
+
+      border: 1px solid var(--line);
+
+      border-radius: 7px;
+
+      background: #fff;
+
+      color: var(--ink);
+
+      padding: 0 11px;
+
+      font: inherit;
+
+    }
+
+    button {
+
+      cursor: pointer;
+
+      font-weight: 620;
+
+    }
+
+    button.primary {
+
+      background: #1f6fbd;
+
+      border-color: #1f6fbd;
+
+      color: #fff;
+
+    }
+
+    button.danger {
+
+      background: #fff1f2;
+
+      border-color: #f43f5e;
+
+      color: #be123c;
+
+    }
+
+    button.quiet {
+
+      background: #f8fafc;
+
+      border-color: #cbd5e1;
+
+      color: #334155;
+
+    }
+
+    button:disabled {
+
+      opacity: .45;
+
+      cursor: not-allowed;
+
+    }
+
+    .toolbar-group {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 5px;
+
+      border: 1px solid #dbe3ee;
+
+      border-radius: 9px;
+
+      background: #f8fafc;
+
+    }
+
+    .revision-tools {
+
+      background: #eff6ff;
+
+      border-color: #bfdbfe;
+
+    }
+
+    .revision-period { min-width: 190px; }
+
+    .reference-date-control {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      color: #334155;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      white-space: nowrap;
+
+    }
+
+    .reference-date-control input {
+
+      height: 34px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 7px;
+
+      background: #fff;
+
+      color: var(--ink);
+
+      padding: 0 8px;
+
+      font: inherit;
+
+      min-width: 138px;
+
+    }
+
+    #scrollStart, #scrollLeft, #scrollRight, #scrollEnd {
+
+      min-width: 38px;
+
+      padding: 0 9px;
+
+      font-size: 17px;
+
+      line-height: 1;
+
+    }
+
+    .scroll-controls {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      min-width: min(460px, 100%);
+
+    }
+
+    .timeline-slider {
+
+      width: clamp(160px, 24vw, 320px);
+
+      accent-color: #1f6fbd;
+
+      cursor: pointer;
+
+    }
+
+    .sticky-tools {
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 30;
+
+      background: #fff;
+
+      border-bottom: 1px solid var(--line);
+
+      box-shadow: 0 8px 18px rgba(16, 24, 39, .05);
+
+    }
+
+    .legend {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 18px;
+
+      padding: 10px 24px;
+
+      background: #fff;
+
+      border-bottom: 1px solid var(--line);
+
+      color: var(--muted);
+
+      font-size: 14px;
+
+      flex-wrap: wrap;
+
+    }
+
+    .scroll-dock {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      padding: 9px 24px 10px;
+
+      background: #fff;
+
+      border-top: 1px solid var(--soft-line);
+
+    }
+
+    .key { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+
+    .swatch { width: 24px; height: 12px; border-radius: 3px; border: 1px solid; }
+
+    .swatch.consultant { background: var(--consultant); border-color: var(--consultant-stroke); }
+
+    .swatch.aot { background: var(--aot); border-color: var(--aot-stroke); }
+
     .swatch.reserve { background: rgba(196, 181, 253, .45); border-color: rgba(124, 58, 237, .45); }
-    .diamond {
-      width: 12px;
-      height: 12px;
-      background: var(--meeting);
-      transform: rotate(45deg);
-      border-radius: 2px;
-      display: inline-block;
-    }
-    .diamond.planned { background: var(--planned); }
-    .diamond.adjusted { background: var(--adjusted); }
-    .timing-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      display: inline-block;
-      border: 1px solid;
-    }
-    .timing-dot.actual { background: #2563eb; border-color: #1d4ed8; }
-    .timing-dot.estimate { background: #bfdbfe; border-color: #60a5fa; border-style: dashed; }
-    .workspace {
-      overflow: auto;
-      padding: 18px 24px 28px;
-    }
+
+    .diamond {
+
+      width: 12px;
+
+      height: 12px;
+
+      background: var(--meeting);
+
+      transform: rotate(45deg);
+
+      border-radius: 2px;
+
+      display: inline-block;
+
+    }
+
+    .diamond.planned { background: var(--planned); }
+
+    .diamond.adjusted { background: var(--adjusted); }
+
+    .timing-dot {
+
+      width: 12px;
+
+      height: 12px;
+
+      border-radius: 999px;
+
+      display: inline-block;
+
+      border: 1px solid;
+
+    }
+
+    .timing-dot.actual { background: #2563eb; border-color: #1d4ed8; }
+
+    .timing-dot.estimate { background: #bfdbfe; border-color: #60a5fa; border-style: dashed; }
+
+    .workspace {
+
+      overflow: auto;
+
+      padding: 18px 24px 28px;
+
+    }
+
     .summary {
 
       position: sticky;
@@ -255,92 +464,177 @@
 
     .metric.late { background: #fde2e1; border-color: #f4aaa8; }
 
-    .period-summary { display: none; }
-    .period-summary-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .period-summary h2 {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.2;
-    }
-    .period-summary-note {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .period-summary table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .period-summary th,
-    .period-summary td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--soft-line);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .period-summary th:first-child,
-    .period-summary td:first-child { text-align: left; }
-    .period-summary tr:last-child td { border-bottom: 0; }
-    .contract-summary {
-      position: sticky;
-      left: 24px;
-      z-index: 4;
-      width: calc(100vw - 48px);
-      min-width: 760px;
-      margin-top: 14px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    .contract-summary-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .contract-summary h2 {
-      margin: 0;
-      font-size: 15px;
-      line-height: 1.2;
-    }
-    .contract-summary-note {
-      color: var(--muted);
-      font-size: 12px;
-    }
-    .contract-summary table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .contract-summary th,
-    .contract-summary td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--soft-line);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .contract-summary th:first-child,
-    .contract-summary td:first-child,
-    .contract-summary th:nth-child(2),
-    .contract-summary td:nth-child(2) {
-      text-align: left;
-    }
-    .contract-summary tr:last-child td { border-bottom: 0; }
+    .period-summary { display: none; }
+
+    .period-summary-head {
+
+      display: flex;
+
+      align-items: baseline;
+
+      justify-content: space-between;
+
+      gap: 14px;
+
+      padding: 10px 12px;
+
+      border-bottom: 1px solid var(--soft-line);
+
+    }
+
+    .period-summary h2 {
+
+      margin: 0;
+
+      font-size: 15px;
+
+      line-height: 1.2;
+
+    }
+
+    .period-summary-note {
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+    }
+
+    .period-summary table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      font-size: 13px;
+
+    }
+
+    .period-summary th,
+
+    .period-summary td {
+
+      padding: 8px 10px;
+
+      border-bottom: 1px solid var(--soft-line);
+
+      text-align: right;
+
+      white-space: nowrap;
+
+    }
+
+    .period-summary th:first-child,
+
+    .period-summary td:first-child { text-align: left; }
+
+    .period-summary tr:last-child td { border-bottom: 0; }
+
+    .contract-summary {
+
+      position: sticky;
+
+      left: 24px;
+
+      z-index: 4;
+
+      width: calc(100vw - 48px);
+
+      min-width: 760px;
+
+      margin-top: 14px;
+
+      background: #fff;
+
+      border: 1px solid var(--line);
+
+      border-radius: 8px;
+
+      overflow: hidden;
+
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+
+    }
+
+    .contract-summary-head {
+
+      display: flex;
+
+      align-items: baseline;
+
+      justify-content: space-between;
+
+      gap: 14px;
+
+      padding: 10px 12px;
+
+      border-bottom: 1px solid var(--soft-line);
+
+    }
+
+    .contract-summary h2 {
+
+      margin: 0;
+
+      font-size: 15px;
+
+      line-height: 1.2;
+
+    }
+
+    .contract-summary-note {
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+    }
+
+    .contract-summary table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      font-size: 13px;
+
+    }
+
+    .contract-summary th,
+
+    .contract-summary td {
+
+      padding: 8px 10px;
+
+      border-bottom: 1px solid var(--soft-line);
+
+      text-align: right;
+
+      white-space: nowrap;
+
+    }
+
+    .contract-summary th:first-child,
+
+    .contract-summary td:first-child,
+
+    .contract-summary th:nth-child(2),
+
+    .contract-summary td:nth-child(2) {
+
+      text-align: left;
+
+    }
+
+    .contract-summary tr:last-child td { border-bottom: 0; }
     .contract-summary tr.current-period-summary td { background: rgba(250, 204, 21, .08); }
-    .contract-summary .late { color: #b91c1c; font-weight: 750; }
-    .contract-summary .early { color: #075985; font-weight: 750; }
-    .contract-summary .good { color: #166534; font-weight: 750; }
+
+    .contract-summary .late { color: #b91c1c; font-weight: 750; }
+
+    .contract-summary .early { color: #075985; font-weight: 750; }
+
+    .contract-summary .good { color: #166534; font-weight: 750; }
+
     .contract-summary { border-radius: 3px; box-shadow: none; }
 
     .contract-summary-head { background: #f8fbff; }
@@ -349,137 +643,286 @@
 
     .contract-summary tbody tr:nth-child(even) td { background: #fbfdff; }
 
-    .timing-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 72px;
-      height: 28px;
-      border-radius: 999px;
-      padding: 0 9px;
-      font-size: 13px;
-      font-weight: 700;
-      border: 1px solid;
-    }
-    .timing-pill.actual { background: #dbeafe; border-color: #60a5fa; color: #1e40af; }
-    .timing-pill.estimate { background: #fef9c3; border-color: #facc15; color: #854d0e; }
-    .timing-pill.good { background: #dcfce7; border-color: #22c55e; color: #166534; }
-    .timing-pill.early { background: #e0f2fe; border-color: #38bdf8; color: #075985; }
-    .timing-pill.late { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
-    .timing-pill.forecast {
-      background: #ffedd5;
-      border-color: #f97316;
-      color: #9a3412;
-    }
-    .board {
-      width: calc(var(--label) + var(--timeline-width, 980px));
-      min-width: 1540px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: visible;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    :root.quarter-scale {
-      --label: 556px;
-    }
-    :root.quarter-scale .board {
-      min-width: 0;
-    }
-    :root.quarter-scale .left-head,
-    :root.quarter-scale .cell-grid {
-      grid-template-columns: 206px 190px 160px;
-    }
-    :root.quarter-scale .left-head > div,
-    :root.quarter-scale .cell-grid > div {
-      display: block;
-    }
-    :root.quarter-scale .month-label,
-    :root.quarter-scale .meeting-label {
-      display: none;
-    }
-    :root.quarter-scale .week-label {
-      top: 28px;
-      color: #334155;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .gantt-head, .gantt-row, .section-row {
-      display: grid;
-      grid-template-columns: var(--label) var(--timeline-width, 980px);
-      width: 100%;
-    }
-    .left-head {
-      background: var(--header);
-      color: #fff;
-      border-right: 1px solid #111827;
-      display: grid;
-      grid-template-columns: 206px 190px 160px;
-      align-items: center;
-      min-height: 84px;
-      position: sticky;
-      left: 0;
-      z-index: 24;
-    }
-    .left-head > div, .cell-grid > div {
-      padding: 9px 10px;
-      min-width: 0;
-    }
-    .left-head > div:nth-child(n+11) { display: none; }
-    .left-head > div { border-right: 1px solid rgba(255,255,255,.14); }
-    .cell-grid > div { border-right: 1px solid var(--soft-line); }
-    .timeline-head {
-      position: relative;
-      min-height: 84px;
-      background-color: #f8fbff;
-      background-image: repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px));
-      border-bottom: 1px solid var(--line);
-      overflow: hidden;
-    }
-    .month-label {
-      position: absolute;
-      top: 10px;
-      height: 20px;
-      padding-left: 6px;
-      color: #334155;
-      font-size: 13px;
-      border-left: 1px solid var(--line);
-      white-space: nowrap;
-    }
-    .week-label {
-      position: absolute;
-      top: 46px;
-      height: 22px;
-      padding-left: 4px;
-      color: #64748b;
-      font-size: 12px;
-      border-left: 1px solid var(--soft-line);
-      white-space: nowrap;
-    }
-    .section-row {
-      height: 32px;
-      background: #eef3f8;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .section-title {
-      position: sticky;
-      left: 0;
-      z-index: 22;
-      background: #eef3f8;
-      padding: 7px 12px;
-      font-weight: 720;
-      color: #0f172a;
-      border-right: 1px solid var(--line);
-    }
-    .section-timeline {
-      background-color: #eef3f8;
-      background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .72) 0, rgba(203, 213, 225, .72) 1px, transparent 1px, transparent var(--week-width, 112px));
-      overflow: hidden;
-    }
-    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
-    .gantt-row.current-period-row .cell-grid { background: #fffdf5; box-shadow: inset 4px 0 0 rgba(245, 158, 11, .32); }
+    .timing-pill {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      min-width: 72px;
+
+      height: 28px;
+
+      border-radius: 999px;
+
+      padding: 0 9px;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      border: 1px solid;
+
+    }
+
+    .timing-pill.actual { background: #dbeafe; border-color: #60a5fa; color: #1e40af; }
+
+    .timing-pill.estimate { background: #fef9c3; border-color: #facc15; color: #854d0e; }
+
+    .timing-pill.good { background: #dcfce7; border-color: #22c55e; color: #166534; }
+
+    .timing-pill.early { background: #e0f2fe; border-color: #38bdf8; color: #075985; }
+
+    .timing-pill.late { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+    .timing-pill.forecast {
+
+      background: rgba(139, 92, 246, .16);
+
+      border-color: #8b5cf6;
+
+      color: #5b21b6;
+
+    }
+
+    .forecast-pill-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      line-height: 1;
+      vertical-align: middle;
+    }
+
+    .forecast-label {
+      display: block;
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      color: #7c3aed;
+    }
+
+    .board {
+
+      width: calc(var(--label) + var(--timeline-width, 980px));
+
+      min-width: 1540px;
+
+      background: var(--panel);
+
+      border: 1px solid var(--line);
+
+      border-radius: 8px;
+
+      overflow: visible;
+
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+
+    }
+
+    :root.quarter-scale {
+
+      --label: 556px;
+
+    }
+
+    :root.quarter-scale .board {
+
+      min-width: 0;
+
+    }
+
+    :root.quarter-scale .left-head,
+
+    :root.quarter-scale .cell-grid {
+
+      grid-template-columns: 206px 190px 160px;
+
+    }
+
+    :root.quarter-scale .left-head > div,
+
+    :root.quarter-scale .cell-grid > div {
+
+      display: block;
+
+    }
+
+    :root.quarter-scale .month-label,
+
+    :root.quarter-scale .meeting-label {
+
+      display: none;
+
+    }
+
+    :root.quarter-scale .week-label {
+
+      top: 28px;
+
+      color: #334155;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+    }
+
+    .gantt-head, .gantt-row, .section-row {
+
+      display: grid;
+
+      grid-template-columns: var(--label) var(--timeline-width, 980px);
+
+      width: 100%;
+
+    }
+
+    .left-head {
+
+      background: var(--header);
+
+      color: #fff;
+
+      border-right: 1px solid #111827;
+
+      display: grid;
+
+      grid-template-columns: 206px 190px 160px;
+
+      align-items: center;
+
+      min-height: 84px;
+
+      position: sticky;
+
+      left: 0;
+
+      z-index: 24;
+
+    }
+
+    .left-head > div, .cell-grid > div {
+
+      padding: 9px 10px;
+
+      min-width: 0;
+
+    }
+
+    .left-head > div:nth-child(n+11) { display: none; }
+
+    .left-head > div { border-right: 1px solid rgba(255,255,255,.14); }
+
+    .cell-grid > div { border-right: 1px solid var(--soft-line); }
+
+    .timeline-head {
+
+      position: relative;
+
+      min-height: 84px;
+
+      background-color: #f8fbff;
+
+      background-image: repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px));
+
+      border-bottom: 1px solid var(--line);
+
+      overflow: hidden;
+
+    }
+
+    .month-label {
+
+      position: absolute;
+
+      top: 10px;
+
+      height: 20px;
+
+      padding-left: 6px;
+
+      color: #334155;
+
+      font-size: 13px;
+
+      border-left: 1px solid var(--line);
+
+      white-space: nowrap;
+
+    }
+
+    .week-label {
+
+      position: absolute;
+
+      top: 46px;
+
+      height: 22px;
+
+      padding-left: 4px;
+
+      color: #64748b;
+
+      font-size: 12px;
+
+      border-left: 1px solid var(--soft-line);
+
+      white-space: nowrap;
+
+    }
+
+    .section-row {
+
+      height: 32px;
+
+      background: #eef3f8;
+
+      border-top: 1px solid var(--line);
+
+      border-bottom: 1px solid var(--line);
+
+    }
+
+    .section-title {
+
+      position: sticky;
+
+      left: 0;
+
+      z-index: 22;
+
+      background: #eef3f8;
+
+      padding: 7px 12px;
+
+      font-weight: 720;
+
+      color: #0f172a;
+
+      border-right: 1px solid var(--line);
+
+    }
+
+    .section-timeline {
+
+      background-color: #eef3f8;
+
+      background-image: repeating-linear-gradient(to right, rgba(203, 213, 225, .72) 0, rgba(203, 213, 225, .72) 1px, transparent 1px, transparent var(--week-width, 112px));
+
+      overflow: hidden;
+
+    }
+
+    .gantt-row { min-height: var(--row); border-bottom: 1px solid var(--soft-line); }
+    .gantt-row.current-period-row .cell-grid { background: #fffdf5; box-shadow: inset 4px 0 0 rgba(245, 158, 11, .32); }
     .gantt-row.current-period-row .timeline { background-color: #fffdf7; }
+
     .overview-row {
 
       display: grid;
@@ -546,185 +989,364 @@
 
     .overview-today-label { position: absolute; top: 72px; transform: translateX(-50%); color: #b91c1c; font-size: 11px; font-weight: 800; white-space: nowrap; z-index: 4; }
 
-    .cell-grid {
-      position: sticky;
-      left: 0;
-      z-index: 20;
-      background: #fff;
-      display: grid;
-      grid-template-columns: 206px 190px 160px;
-      align-items: center;
-      border-right: 1px solid var(--line);
-    }
-    .cell-grid input, .cell-grid select {
-      width: 100%;
-      height: 28px;
-      border: 1px solid transparent;
-      border-radius: 5px;
-      background: transparent;
-      padding: 0 5px;
-      color: var(--ink);
-      font: inherit;
-      min-width: 0;
-    }
-    .period-cell {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 14px;
-    }
-    .period-cell.number {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .cell-grid input:hover, .cell-grid input:focus,
-    .cell-grid select:hover, .cell-grid select:focus {
-      background: #f8fafc;
-      border-color: #cbd5e1;
-      outline: none;
-    }
-    .type-pill {
-      height: 24px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 8px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .type-pill.consultant { background: #dceefe; color: #155ba1; }
-    .type-pill.aot { background: #fff4b8; color: #8a6100; }
-    .end-date {
-      color: #334155;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .timeline {
-      position: relative;
-      z-index: 1;
-      min-height: var(--row);
-      overflow: hidden;
-      background-color: #fff;
-      background-image:
-        repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px)),
-        linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0));
-      background-size: auto, 100% 100%;
-    }
-    .bar {
-      position: absolute;
-      top: 13px;
-      height: 22px;
-      border-radius: 4px;
-      border: 1px solid;
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,.08);
-    }
-    .bar.consultant.actual { background: var(--consultant); border-color: var(--consultant-stroke); }
-    .bar.aot.actual { background: var(--aot); border-color: var(--aot-stroke); }
-    .bar.consultant.estimate {
-      background: var(--consultant-estimate);
-      border-color: var(--consultant-stroke);
-      border-style: dashed;
-    }
-    .bar.aot.estimate {
-      background: var(--aot-estimate);
-      border-color: var(--aot-stroke);
-      border-style: dashed;
-    }
-    .reserve-bar {
-      position: absolute;
-      top: 55px;
-      height: 12px;
-      border-radius: 999px;
-      background: rgba(196, 181, 253, .34);
-      border: 1px solid rgba(124, 58, 237, .36);
-      box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
-      z-index: 2;
-    }
-    .planned-marker,
-    .adjusted-marker {
-      position: absolute;
-      top: 50px;
-      width: 15px;
-      height: 15px;
-      margin-left: -7px;
-      border: 2px solid #fff;
-      transform: rotate(45deg);
-      border-radius: 3px;
-      z-index: 5;
-    }
-    .planned-marker {
-      background: var(--planned);
-      outline: 1px solid rgba(21, 128, 61, .65);
-    }
-    .adjusted-marker {
-      background: rgba(124, 58, 237, .68);
-      outline: 1px solid rgba(91, 33, 182, .38);
-    }
-    .planned-label,
-    .adjusted-label {
-      display: none;
-    }
-    .planned-label { color: #15803d; }
-    .adjusted-label { color: #6d28d9; }
-    .today-line {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      margin-left: -1px;
-      background: var(--today);
-      opacity: .42;
-      z-index: 4;
-      pointer-events: none;
-    }
-    .timeline-head .today-line { opacity: .62; }
-    .today-chart-line {
-      display: none;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      margin-left: -1px;
-      background: var(--today);
-      opacity: .7;
-      z-index: 18;
-      pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(255,255,255,.75);
-    }
-    .today-label {
-      position: absolute;
-      top: 72px;
-      transform: translateX(-50%);
-      color: var(--today);
-      font-size: 10px;
-      font-weight: 700;
-      white-space: nowrap;
-      z-index: 5;
-    }
-    .meeting-marker {
-      position: absolute;
-      top: 15px;
-      width: 16px;
-      height: 16px;
-      margin-left: -8px;
-      background: var(--meeting);
-      border: 2px solid #fff;
-      outline: 1px solid rgba(145, 25, 25, .6);
-      transform: rotate(45deg);
-      border-radius: 3px;
-      z-index: 5;
-    }
-    .meeting-label {
-      position: absolute;
-      top: 37px;
-      transform: translateX(-50%);
-      color: #b91c1c;
-      font-size: 11px;
-      white-space: nowrap;
-      z-index: 5;
-    }
+    .cell-grid {
+
+      position: sticky;
+
+      left: 0;
+
+      z-index: 20;
+
+      background: #fff;
+
+      display: grid;
+
+      grid-template-columns: 206px 190px 160px;
+
+      align-items: center;
+
+      border-right: 1px solid var(--line);
+
+    }
+
+    .cell-grid input, .cell-grid select {
+
+      width: 100%;
+
+      height: 28px;
+
+      border: 1px solid transparent;
+
+      border-radius: 5px;
+
+      background: transparent;
+
+      padding: 0 5px;
+
+      color: var(--ink);
+
+      font: inherit;
+
+      min-width: 0;
+
+    }
+
+    .period-cell {
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+
+      font-size: 14px;
+
+    }
+
+    .period-cell.number {
+
+      text-align: right;
+
+      font-variant-numeric: tabular-nums;
+
+    }
+
+    .cell-grid input:hover, .cell-grid input:focus,
+
+    .cell-grid select:hover, .cell-grid select:focus {
+
+      background: #f8fafc;
+
+      border-color: #cbd5e1;
+
+      outline: none;
+
+    }
+
+    .type-pill {
+
+      height: 24px;
+
+      border-radius: 999px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 0 8px;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      white-space: nowrap;
+
+    }
+
+    .type-pill.consultant { background: #dceefe; color: #155ba1; }
+
+    .type-pill.aot { background: #fff4b8; color: #8a6100; }
+
+    .end-date {
+
+      color: #334155;
+
+      font-size: 12px;
+
+      white-space: nowrap;
+
+    }
+
+    .timeline {
+
+      position: relative;
+
+      z-index: 1;
+
+      min-height: var(--row);
+
+      overflow: hidden;
+
+      background-color: #fff;
+
+      background-image:
+
+        repeating-linear-gradient(to right, var(--soft-line) 0, var(--soft-line) 1px, transparent 1px, transparent var(--week-width, 112px)),
+
+        linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0));
+
+      background-size: auto, 100% 100%;
+
+    }
+
+    .bar {
+
+      position: absolute;
+
+      top: 13px;
+
+      height: 22px;
+
+      border-radius: 4px;
+
+      border: 1px solid;
+
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.08);
+
+    }
+
+    .bar.consultant.actual { background: var(--consultant); border-color: var(--consultant-stroke); }
+
+    .bar.aot.actual { background: var(--aot); border-color: var(--aot-stroke); }
+
+    .bar.consultant.estimate {
+
+      background: var(--consultant-estimate);
+
+      border-color: var(--consultant-stroke);
+
+      border-style: dashed;
+
+    }
+
+    .bar.aot.estimate {
+
+      background: var(--aot-estimate);
+
+      border-color: var(--aot-stroke);
+
+      border-style: dashed;
+
+    }
+
+    .reserve-bar {
+
+      position: absolute;
+
+      top: 55px;
+
+      height: 12px;
+
+      border-radius: 999px;
+
+      background: rgba(167, 139, 250, .26);
+
+      border: 1px solid rgba(124, 58, 237, .38);
+
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,.06);
+
+      z-index: 2;
+
+    }
+
+    .planned-marker,
+
+    .adjusted-marker {
+
+      position: absolute;
+
+      top: 50px;
+
+      width: 15px;
+
+      height: 15px;
+
+      margin-left: -7px;
+
+      border: 2px solid #fff;
+
+      transform: rotate(45deg);
+
+      border-radius: 3px;
+
+      z-index: 5;
+
+    }
+
+    .planned-marker {
+
+      background: var(--planned);
+
+      outline: 1px solid rgba(21, 128, 61, .65);
+
+    }
+
+    .adjusted-marker {
+
+      background: var(--adjusted);
+
+      outline: 1px solid rgba(91, 33, 182, .65);
+
+    }
+
+    .planned-label,
+
+    .adjusted-label {
+
+      display: none;
+
+    }
+
+    .planned-label { color: #15803d; }
+
+    .adjusted-label { color: #6d28d9; }
+
+    .today-line {
+
+      position: absolute;
+
+      top: 0;
+
+      bottom: 0;
+
+      width: 2px;
+
+      margin-left: -1px;
+
+      background: var(--today);
+
+      opacity: .42;
+
+      z-index: 4;
+
+      pointer-events: none;
+
+    }
+
+    .timeline-head .today-line { opacity: .62; }
+
+    .today-chart-line {
+
+      display: none;
+
+      position: absolute;
+
+      top: 0;
+
+      bottom: 0;
+
+      width: 3px;
+
+      margin-left: -1px;
+
+      background: var(--today);
+
+      opacity: .7;
+
+      z-index: 18;
+
+      pointer-events: none;
+
+      box-shadow: 0 0 0 1px rgba(255,255,255,.75);
+
+    }
+
+    .today-label {
+
+      position: absolute;
+
+      top: 72px;
+
+      transform: translateX(-50%);
+
+      color: var(--today);
+
+      font-size: 10px;
+
+      font-weight: 700;
+
+      white-space: nowrap;
+
+      z-index: 5;
+
+    }
+
+    .meeting-marker {
+
+      position: absolute;
+
+      top: 15px;
+
+      width: 16px;
+
+      height: 16px;
+
+      margin-left: -8px;
+
+      background: var(--meeting);
+
+      border: 2px solid #fff;
+
+      outline: 1px solid rgba(145, 25, 25, .6);
+
+      transform: rotate(45deg);
+
+      border-radius: 3px;
+
+      z-index: 5;
+
+    }
+
+    .meeting-label {
+
+      position: absolute;
+
+      top: 37px;
+
+      transform: translateX(-50%);
+
+      color: #b91c1c;
+
+      font-size: 11px;
+
+      white-space: nowrap;
+
+      z-index: 5;
+
+    }
+
 
     /* Prototype 2: integrated cool palette and continuous gantt bars */
     .metric {
@@ -783,323 +1405,651 @@
     .planned-marker,
     .adjusted-marker { top: 56px; width: 10px; height: 10px; margin-left: -5px; border-width: 1px; border-radius: 2px; }
 
-    .editor-panel {
-      position: sticky;
-      left: 24px;
-      z-index: 5;
-      width: calc(100vw - 48px);
-      min-width: 980px;
-      margin-top: 16px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
-    }
-    .editor-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--soft-line);
-    }
-    .editor-head h2 {
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.25;
-    }
-    .editor-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .editor-actions select,
-    .editor-actions button {
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      padding: 0 9px;
-      font: inherit;
-      font-size: 13px;
-    }
-    .editor-actions button {
-      border-color: #2563eb;
-      background: #2563eb;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .editor-actions button.danger {
-      border-color: #f43f5e;
-      background: #fff1f2;
-      color: #be123c;
-    }
-    .editor-meta {
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .editor-table-wrap { overflow-x: auto; }
-    .editor-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      font-size: 14px;
-    }
-    .editor-table th,
-    .editor-table td {
-      border-bottom: 1px solid var(--soft-line);
-      border-right: 1px solid var(--soft-line);
-      padding: 8px 9px;
-      text-align: left;
-      vertical-align: middle;
-    }
-    .editor-table th {
-      background: #f8fafc;
-      color: #334155;
-      font-weight: 720;
-      white-space: nowrap;
-    }
-    .editor-table td:last-child,
-    .editor-table th:last-child { border-right: 0; }
-    .editor-table tr.current-work-row td {
-      background: #fff7ed;
-      box-shadow: inset 4px 0 0 #f97316;
-    }
-    .editor-table tr.current-work-row input,
-    .editor-table tr.current-work-row select {
-      border-color: #fb923c;
-      background: #fffaf5;
-    }
-    .editor-table tr:last-child td { border-bottom: 0; }
-    .editor-table input,
-    .editor-table select {
-      width: 100%;
-      height: 34px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #fff;
-      padding: 0 8px;
-      color: var(--ink);
-      font: inherit;
-      min-width: 0;
-    }
-    .editor-table input[type="number"] {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .editor-table .number {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .editor-period {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 650;
-    }
-    @media (max-width: 760px) {
-      header { flex-direction: column; }
-      .toolbar { justify-content: flex-start; }
-      .scroll-dock { align-items: flex-start; flex-direction: column; }
-      .workspace { padding: 12px; }
-      .summary, .period-summary, .contract-summary, .editor-panel {
-        left: 12px;
-        width: calc(100vw - 24px);
-      }
-      .summary { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
-    }
-    @media print {
-      @page { size: A4 landscape; margin: 5mm; }
-      :root { --row: 58px; }
-      body { background: #fff; }
-      html, body { width: 297mm; height: 210mm; overflow: hidden; }
-      .app { display: block; min-height: 0; }
-      header {
-        position: static;
-        box-shadow: none;
-        padding: 0 0 5px;
-        border-bottom: 0;
-      }
-      header h1 { font-size: 18px; margin-bottom: 3px; }
-      header .sub { font-size: 10px; }
-      .toolbar, .scroll-dock, .editor-panel { display: none !important; }
-      .sticky-tools {
-        position: static;
-        box-shadow: none;
-        border-bottom: 0;
-        padding: 0 0 5px;
-      }
-      .legend {
-        padding: 0;
-        gap: 6px 9px;
-        font-size: 8px;
-      }
-      .swatch { width: 16px; height: 8px; }
-      .diamond, .timing-dot { width: 9px; height: 9px; }
-      .workspace { overflow: visible; padding: 0; }
-      .summary {
-        position: static;
-        left: auto;
-        width: 100%;
-        min-width: 0;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 4px;
-        margin-bottom: 6px;
-      }
-      .metric {
-        border-radius: 4px;
-        padding: 5px 6px;
-      }
-      .metric b { font-size: 10px; line-height: 1.15; }
-      .metric span { font-size: 8px; line-height: 1.2; }
-      .bar,
-      .swatch,
-      .diamond,
-      .timing-dot,
-      .reserve-bar,
-      .planned-marker,
-      .adjusted-marker,
-      .meeting-marker,
-      .timing-pill {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      .board {
-        box-shadow: none;
-        border-radius: 0;
-        transform: scale(.98);
-        transform-origin: top left;
-      }
-      .contract-summary {
-        position: static;
-        left: auto;
-        width: 100%;
-        min-width: 0;
-        margin-top: 2px;
-        border-radius: 4px;
-        box-shadow: none;
-      }
-      .contract-summary-head {
-        padding: 5px 6px;
-      }
-      .contract-summary h2 { font-size: 10px; }
-      .contract-summary-note { font-size: 8px; }
-      .contract-summary table { font-size: 8px; }
-      .contract-summary th,
-      .contract-summary td {
-        padding: 4px 6px;
-      }
-      .left-head, .timeline-head { min-height: 56px; }
-      .left-head > div, .cell-grid > div { padding: 6px 7px; font-size: 10px; }
-      .week-label { top: 22px; font-size: 9px; }
-      .today-label { font-size: 9px; }
-      .today-chart-line,
-      .today-line {
-        display: block;
-        background: transparent !important;
-        border-left: 2px solid #111827;
-        width: 0;
-        opacity: 1;
-        box-shadow: none;
-      }
-      .timeline-head .today-line {
-        border-left-width: 2px;
-        opacity: 1;
-      }
-      .bar { top: 7px; height: 19px; }
-      .reserve-bar { top: 37px; height: 8px; }
-      .planned-marker, .adjusted-marker { top: 36px; width: 9px; height: 9px; margin-left: -4px; }
-      .meeting-marker { top: 12px; width: 8px; height: 8px; }
+
+    .save-state { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; color: #334155; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .save-state.dirty { background: #fff7ed; border-color: #fb923c; color: #9a3412; }
+    .change-review { position: sticky; left: 24px; z-index: 5; width: calc(100vw - 48px); min-width: 760px; margin: 0 0 12px; background: #f8fbff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 10px 24px rgba(15, 23, 42, .05); }
+    .change-review-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--soft-line); }
+    .change-review-title { font-weight: 800; color: #0f172a; }
+    .change-review-note { color: var(--muted); font-size: 12px; }
+    .change-list { display: grid; gap: 5px; max-height: 170px; overflow: auto; padding: 10px 12px; font-size: 12px; }
+    .change-item { display: grid; grid-template-columns: 22px minmax(140px, 1.2fr) 100px minmax(170px, 1fr); gap: 8px; align-items: center; padding: 5px 7px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; }
+    .change-symbol { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 999px; font-weight: 900; }
+    .change-symbol.manual { background: #dbeafe; color: #1d4ed8; }
+    .change-symbol.auto { background: #fef3c7; color: #92400e; }
+    .change-field { color: #475569; font-weight: 700; }
+    .change-empty { color: var(--muted); }
+    .cell-manual { background: #eff6ff !important; box-shadow: inset 3px 0 0 #3b82f6; }
+    .cell-auto { background: #fffbeb !important; box-shadow: inset 3px 0 0 #f59e0b; }
+    .change-cell-marker { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-right: 4px; border-radius: 999px; font-size: 11px; font-weight: 900; vertical-align: middle; }
+    .change-cell-marker.manual { background: #dbeafe; color: #1d4ed8; }
+    .change-cell-marker.auto { background: #fef3c7; color: #92400e; }
+
+    .editor-panel {
+
+      position: sticky;
+
+      left: 24px;
+
+      z-index: 5;
+
+      width: calc(100vw - 48px);
+
+      min-width: 980px;
+
+      margin-top: 16px;
+
+      background: #fff;
+
+      border: 1px solid var(--line);
+
+      border-radius: 8px;
+
+      overflow: hidden;
+
+      box-shadow: 0 10px 28px rgba(16, 24, 39, .07);
+
+    }
+
+    .editor-head {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      padding: 12px 14px;
+
+      border-bottom: 1px solid var(--soft-line);
+
+    }
+
+    .editor-head h2 {
+
+      margin: 0;
+
+      font-size: 17px;
+
+      line-height: 1.25;
+
+    }
+
+    .editor-actions {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 8px;
+
+      flex-wrap: wrap;
+
+    }
+
+    .editor-actions select,
+
+    .editor-actions button {
+
+      height: 32px;
+
+      border-radius: 6px;
+
+      border: 1px solid #cbd5e1;
+
+      background: #fff;
+
+      padding: 0 9px;
+
+      font: inherit;
+
+      font-size: 13px;
+
+    }
+
+    .editor-actions button {
+
+      border-color: #2563eb;
+
+      background: #2563eb;
+
+      color: #fff;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+    }
+
+    .editor-actions button.danger {
+
+      border-color: #f43f5e;
+
+      background: #fff1f2;
+
+      color: #be123c;
+
+    }
+
+    .editor-meta {
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      white-space: nowrap;
+
+    }
+
+    .editor-table-wrap { overflow-x: auto; }
+
+    .editor-table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      table-layout: fixed;
+
+      font-size: 14px;
+
+    }
+
+    .editor-table th,
+
+    .editor-table td {
+
+      border-bottom: 1px solid var(--soft-line);
+
+      border-right: 1px solid var(--soft-line);
+
+      padding: 8px 9px;
+
+      text-align: left;
+
+      vertical-align: middle;
+
+    }
+
+    .editor-table th {
+
+      background: #f8fafc;
+
+      color: #334155;
+
+      font-weight: 720;
+
+      white-space: nowrap;
+
+    }
+
+    .editor-table td:last-child,
+
+    .editor-table th:last-child { border-right: 0; }
+
+    .editor-table tr.current-work-row td {
+
+      background: #fff7ed;
+
+      box-shadow: inset 4px 0 0 #f97316;
+
+    }
+
+    .editor-table tr.current-work-row input,
+
+    .editor-table tr.current-work-row select {
+
+      border-color: #fb923c;
+
+      background: #fffaf5;
+
+    }
+
+    .editor-table tr:last-child td { border-bottom: 0; }
+
+    .editor-table input,
+
+    .editor-table select {
+
+      width: 100%;
+
+      height: 34px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #fff;
+
+      padding: 0 8px;
+
+      color: var(--ink);
+
+      font: inherit;
+
+      min-width: 0;
+
+    }
+
+    .editor-table input[type="number"] {
+
+      text-align: right;
+
+      font-variant-numeric: tabular-nums;
+
+    }
+
+    .editor-table .number {
+
+      text-align: right;
+
+      font-variant-numeric: tabular-nums;
+
+    }
+
+    .editor-period {
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+
+      white-space: nowrap;
+
+      font-weight: 650;
+
+    }
+
+    @media (max-width: 760px) {
+
+      header { flex-direction: column; }
+
+      .toolbar { justify-content: flex-start; }
+
+      .scroll-dock { align-items: flex-start; flex-direction: column; }
+
+      .workspace { padding: 12px; }
+
+      .summary, .period-summary, .contract-summary, .editor-panel {
+
+        left: 12px;
+
+        width: calc(100vw - 24px);
+
+      }
+
+      .summary { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+
+    }
+
+    @media print {
+
+      @page { size: A4 landscape; margin: 3mm; }
+
+      :root { --row: 44px; --label: 500px; }
+
+      body { background: #fff; margin: 0; }
+
+      html, body { width: auto; height: auto; overflow: visible; }
+
+      .app { display: block; min-height: 0; }
+
+      header {
+
+        position: static;
+
+        box-shadow: none;
+
+        padding: 0 0 3px;
+
+        border-bottom: 0;
+
+      }
+
+      header h1 { font-size: 18px; margin-bottom: 2px; }
+
+      header .sub { font-size: 9.5px; line-height: 1.15; }
+
+      .toolbar, .scroll-dock, .editor-panel, .change-review { display: none !important; }
+
+      .sticky-tools {
+
+        position: static;
+
+        box-shadow: none;
+
+        border-bottom: 0;
+
+        padding: 0 0 3px;
+
+      }
+
+      .legend {
+
+        padding: 0;
+
+        gap: 6px 9px;
+
+        font-size: 8.5px;
+
+      }
+
+      .swatch { width: 16px; height: 8px; }
+
+      .diamond, .timing-dot { width: 9px; height: 9px; }
+
+      .workspace { overflow: visible; padding: 0; }
+
+      .summary {
+
+        position: static;
+
+        left: auto;
+
+        width: 100%;
+
+        min-width: 0;
+
+        grid-template-columns: repeat(5, 1fr);
+
+        gap: 4px;
+
+        margin-bottom: 5px;
+
+      }
+
+      .metric {
+
+        border-radius: 4px;
+
+        padding: 5px 6px;
+
+      }
+
+      .metric b { font-size: 10.5px; line-height: 1.1; }
+
+      .metric span { font-size: 8px; line-height: 1.15; }
+
+      .bar,
+
+      .swatch,
+
+      .diamond,
+
+      .timing-dot,
+
+      .reserve-bar,
+
+      .planned-marker,
+
+      .adjusted-marker,
+
+      .meeting-marker,
+
+      .timing-pill {
+
+        -webkit-print-color-adjust: exact;
+
+        print-color-adjust: exact;
+
+      }
+
+      .board {
+
+        box-shadow: none;
+
+        border-radius: 0;
+
+        min-width: 0 !important;
+
+        width: calc(var(--label) + var(--timeline-width, 620px)) !important;
+
+        transform: scale(1);
+
+        transform-origin: top left;
+
+      }
+
+      .contract-summary {
+
+        position: static;
+
+        left: auto;
+
+        width: 100%;
+
+        min-width: 0;
+
+        margin-top: 5px;
+
+        border-radius: 4px;
+
+        box-shadow: none;
+
+      }
+
+      .contract-summary-head {
+
+        padding: 5px 6px;
+
+      }
+
+      .contract-summary h2 { font-size: 10.5px; }
+
+      .contract-summary-note { font-size: 8px; }
+
+      .contract-summary table { font-size: 8.8px; }
+
+      .contract-summary th,
+
+      .contract-summary td {
+
+        padding: 3px 5px;
+
+      }
+
+      .left-head, .timeline-head { min-height: 46px; }
+
+      :root.quarter-scale .cell-grid { grid-template-columns: 180px 180px 140px; }
+
+      .left-head > div, .cell-grid > div { padding: 5px 6px; font-size: 9.4px; }
+
+      .week-label { top: 18px; font-size: 9px; }
+
+      .today-label { font-size: 9px; }
+
+      .today-chart-line {
+
+        display: block;
+
+        background: transparent !important;
+
+        border-left: 2px solid #111827;
+
+        width: 0;
+
+        opacity: 1;
+
+        box-shadow: none;
+
+      }
+
+      .today-line { display: none !important; }
+
+      .timeline-head .today-line {
+
+        border-left-width: 2px;
+
+        opacity: 1;
+
+      }
+
+      .bar { top: 6px; height: 16px; }
+
+      .reserve-bar { top: 28px; height: 7px; }
+
+      .planned-marker, .adjusted-marker { top: 27px; width: 8px; height: 8px; margin-left: -4px; }
+
+      .meeting-marker { top: 9px; width: 7px; height: 7px; }
+
 
       /* PDF fit and readability override */
-      .legend { font-size: 9.5px; gap: 7px 10px; }
+      .legend { font-size: 9px; gap: 6px 9px; }
       .swatch { width: 17px; height: 9px; }
       .diamond, .timing-dot { width: 9px; height: 9px; }
-      .summary { gap: 5px; margin-bottom: 7px; }
-      .metric { padding: 6px 7px; }
-      .metric b { font-size: 12px; line-height: 1.15; }
-      .metric span { font-size: 9px; line-height: 1.25; }
-      .contract-summary-head { padding: 6px 7px; }
-      .contract-summary h2 { font-size: 12px; }
-      .contract-summary-note { font-size: 9px; }
-      .contract-summary table { font-size: 9.5px; }
-      .contract-summary th, .contract-summary td { padding: 4px 6px; }
-      .left-head, .timeline-head { min-height: 62px; }
-      .left-head > div, .cell-grid > div { padding: 7px 8px; font-size: 11px; }
-      .week-label { top: 24px; font-size: 10px; }
-      .today-label { font-size: 9px; }
-      .bar { top: 7px; height: 19px; }
-      .reserve-bar { top: 37px; height: 8px; }
-      .planned-marker, .adjusted-marker { top: 36px; width: 9px; height: 9px; margin-left: -4px; }
-      .meeting-marker { top: 12px; width: 8px; height: 8px; margin-left: -4px; }
+      .summary { gap: 4px; margin-bottom: 5px; }
+      .metric { padding: 5px 6px; min-height: 36px; }
+      .metric b { font-size: 11px; line-height: 1.1; }
+      .metric span { font-size: 8.2px; line-height: 1.15; }
+      .contract-summary-head { padding: 5px 6px; }
+      .contract-summary h2 { font-size: 11px; }
+      .contract-summary-note { font-size: 8.5px; }
+      .contract-summary table { font-size: 8.8px; }
+      .contract-summary th, .contract-summary td { padding: 3px 5px; }
+      .left-head, .timeline-head { min-height: 46px; }
+      .left-head > div, .cell-grid > div { padding: 5px 6px; font-size: 9.4px; }
+      .week-label { top: 18px; font-size: 9px; }
+      .today-label { font-size: 8.5px; }
+      .bar { top: 6px; height: 16px; }
+      .reserve-bar { top: 28px; height: 7px; }
+      .planned-marker, .adjusted-marker { top: 27px; width: 8px; height: 8px; margin-left: -4px; }
+      .meeting-marker { top: 9px; width: 7px; height: 7px; margin-left: -3px; }
 
-      button, select.range, input[type="range"] { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <header>
-      <div>
+      button, select.range, input[type="range"] { display: none; }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="app">
+
+    <header>
+
+      <div>
+
         <h1>CRA Project Timeline</h1>
-        <div class="sub">แก้ไขวันที่จากตารางปรับวันที่ด้านล่าง กราฟจะคำนวณวันสิ้นสุด จำนวนวัน และเลื่อนช่วงงานถัดไปอัตโนมัติ พร้อม marker วันประชุมตรวจรับ</div>
-      </div>
-      <div class="toolbar">
-        <div class="toolbar-group revision-tools" aria-label="จัดการรอบแก้ไข">
-          <select id="toolbarRevisionPeriod" class="revision-period" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข"></select>
-          <button id="toolbarAddRevisionRound" class="primary" type="button">เพิ่มรอบแก้ไข</button>
-          <button id="toolbarRemoveRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
-        </div>
-        <div class="toolbar-group file-tools" aria-label="จัดการข้อมูล">
-          <label class="reference-date-control">ข้อมูล ณ วันที่ <input id="referenceDate" type="date"></label>
-          <button id="undoBtn" class="quiet" type="button" disabled>Undo</button>
-          <button id="addRow" class="quiet" type="button">เพิ่มแถวเปล่า</button>
-          <button id="saveHtmlBtn" class="primary" type="button">Save HTML</button>
-          <button id="printBtn" class="primary" type="button">Save as PDF</button>
-        </div>
-      </div>
-    </header>
-    <div class="sticky-tools">
-      <div class="legend">
-        <span class="key"><span class="diamond planned"></span>กำหนดส่งเดิม</span>
-        <span class="key"><span class="swatch reserve"></span>วันสงวนสิทธิ์สะสม</span>
-        <span class="key"><span class="diamond adjusted"></span>กำหนดส่งใหม่</span>
-        <span class="key"><span class="swatch consultant"></span>ที่ปรึกษา ทำงาน/แก้ไข/ส่งงาน</span>
-        <span class="key"><span class="swatch aot"></span>ทอท. พิจารณา/ตรวจรับ</span>
-        <span class="key"><span class="diamond"></span>วันประชุมคณะกรรมการตรวจรับ</span>
-        <span class="key"><span class="timing-dot actual"></span>Actual ก่อนวันนี้</span>
-        <span class="key"><span class="timing-dot estimate"></span>Estimate ตั้งแต่วันนี้เป็นต้นไป</span>
-      </div>
-      <div class="scroll-dock">
-        <select id="scale" class="range" title="ช่วงเวลา">
-          <option value="7">รายสัปดาห์</option>
-          <option value="14">ทุก 2 สัปดาห์</option>
-          <option value="30">รายเดือน</option>
-          <option value="90" selected>รายไตรมาส</option>
-        </select>
-        <div class="scroll-controls" aria-label="เลื่อนซ้ายขวา">
-          <button id="scrollStart" type="button" title="ไปซ้ายสุด">&laquo;</button>
-          <button id="scrollLeft" type="button" title="เลื่อนไปซ้าย">&lsaquo;</button>
-          <input id="timelineSlider" class="timeline-slider" type="range" min="0" value="0" step="1" aria-label="เลื่อนซ้ายขวา">
-          <button id="scrollRight" type="button" title="เลื่อนไปขวา">&rsaquo;</button>
-          <button id="scrollEnd" type="button" title="ไปขวาสุด">&raquo;</button>
-        </div>
-      </div>
-    </div>
-    <main class="workspace">
-      <section class="summary" id="summary"></section>
-      <section class="board" id="board"></section>
-      <section class="contract-summary" id="contractSummary"></section>
-      <section class="editor-panel" id="editor"></section>
-    </main>
-  </div>
-
-  <script>
+
+        <div class="sub">แก้ไขวันที่จากตารางปรับวันที่ด้านล่าง กราฟจะคำนวณวันสิ้นสุด จำนวนวัน และเลื่อนช่วงงานถัดไปอัตโนมัติ พร้อม marker วันประชุมตรวจรับ</div>
+
+      </div>
+
+      <div class="toolbar">
+
+        <div class="toolbar-group revision-tools" aria-label="จัดการรอบแก้ไข">
+
+          <select id="toolbarRevisionPeriod" class="revision-period" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข"></select>
+
+          <button id="toolbarAddRevisionRound" class="primary" type="button">เพิ่มรอบแก้ไข</button>
+
+          <button id="toolbarRemoveRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
+
+        </div>
+
+        <div class="toolbar-group file-tools" aria-label="จัดการข้อมูล">
+
+          <label class="reference-date-control">ข้อมูล ณ วันที่ <input id="referenceDate" type="date"></label>
+
+          <button id="undoBtn" class="quiet" type="button" disabled>Undo</button>
+
+          <button id="addRow" class="quiet" type="button">เพิ่มแถวเปล่า</button>
+
+          <button id="toolbarSaveChanges" class="primary" type="button" disabled>Save Data</button>
+
+          <button id="exportCurrentDataBtn" class="quiet" type="button">Export Data</button>
+
+          <button id="saveHtmlBtn" class="primary" type="button">Save HTML</button>
+
+          <span id="saveState" class="save-state">Saved</span>
+
+          <button id="printBtn" class="primary" type="button">Save as PDF</button>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <div class="sticky-tools">
+
+      <div class="legend">
+
+        <span class="key"><span class="diamond planned"></span>กำหนดส่งเดิม</span>
+
+        <span class="key"><span class="swatch reserve"></span>วันสงวนสิทธิ์สะสม</span>
+
+        <span class="key"><span class="diamond adjusted"></span>กำหนดส่งใหม่</span>
+
+        <span class="key"><span class="swatch consultant"></span>ที่ปรึกษา ทำงาน/แก้ไข/ส่งงาน</span>
+
+        <span class="key"><span class="swatch aot"></span>ทอท. พิจารณา/ตรวจรับ</span>
+
+        <span class="key"><span class="diamond"></span>วันประชุมคณะกรรมการตรวจรับ</span>
+
+        <span class="key"><span class="timing-dot actual"></span>Actual ก่อนวันนี้</span>
+
+        <span class="key"><span class="timing-dot estimate"></span>Estimate ตั้งแต่วันนี้เป็นต้นไป</span>
+
+      </div>
+
+      <div class="scroll-dock">
+
+        <select id="scale" class="range" title="ช่วงเวลา">
+
+          <option value="7">รายสัปดาห์</option>
+
+          <option value="14">ทุก 2 สัปดาห์</option>
+
+          <option value="30">รายเดือน</option>
+
+          <option value="90" selected>รายไตรมาส</option>
+
+        </select>
+
+        <div class="scroll-controls" aria-label="เลื่อนซ้ายขวา">
+
+          <button id="scrollStart" type="button" title="ไปซ้ายสุด">&laquo;</button>
+
+          <button id="scrollLeft" type="button" title="เลื่อนไปซ้าย">&lsaquo;</button>
+
+          <input id="timelineSlider" class="timeline-slider" type="range" min="0" value="0" step="1" aria-label="เลื่อนซ้ายขวา">
+
+          <button id="scrollRight" type="button" title="เลื่อนไปขวา">&rsaquo;</button>
+
+          <button id="scrollEnd" type="button" title="ไปขวาสุด">&raquo;</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <main class="workspace">
+
+      <section class="summary" id="summary"></section>
+
+      <section class="board" id="board"></section>
+
+      <section class="contract-summary" id="contractSummary"></section>
+
+      <section class="change-review" id="changeReview"></section>
+
+      <section class="editor-panel" id="editor"></section>
+
+    </main>
+
+  </div>
+
+
+
+  <script>
+
     const defaultRows = [
 
       { period: 'งวด 1 Inception', org: 'ที่ปรึกษา', item: 'ส่งงาน', type: 'Consultant', start: '2025-08-22', duration: 29, meeting: '2025-09-25', status: 'Actual' },
@@ -1170,6 +2120,8 @@
 
     const editor = document.getElementById('editor');
 
+    const changeReview = document.getElementById('changeReview');
+
     const summary = document.getElementById('summary');
 
     const contractSummary = document.getElementById('contractSummary');
@@ -1182,392 +2134,814 @@
 
     const referenceDateInput = document.getElementById('referenceDate');
 
-    const storageKey = 'cra-auto-gantt-web-v4';
-    const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
-    const undoLimit = 10;
-    const TOR_CONSULTANT_DAYS = 365;
-    const TOR_CUMULATIVE_DAYS_BY_PERIOD = {
-      1: 30,
-      2: 60,
-      3: 120,
-      4: 180,
-      5: 270,
-      6: 300,
-      7: 365
-    };
-    const plannedEndByPeriod = {
-      1: '2025-09-20',
-      2: '2025-10-20',
-      3: '2025-12-19',
-      4: '2026-02-17',
-      5: '2026-05-18',
-      6: '2026-06-17',
-      7: '2026-08-21'
-    };
-    let rows = loadRows();
-    let undoStack = [];
-    let durationEditTimer = null;
-    removeAccidentalDevelopmentRounds();
-    alignRowsAfterPass();
-
-    function loadRows() {
-      try {
-        const saved = localStorage.getItem(storageKey);
-        return saved ? JSON.parse(saved) : structuredClone(defaultRows);
-      } catch (_) {
-        return structuredClone(defaultRows);
-      }
-    }
-    function saveRows() { localStorage.setItem(storageKey, JSON.stringify(rows)); }
-    function cloneRows() { return structuredClone(rows); }
-    function pushUndo() {
-      undoStack.push(cloneRows());
-      if (undoStack.length > undoLimit) undoStack.shift();
-      updateUndoButtons();
-    }
-    function updateUndoButtons() {
-      document.querySelectorAll('[data-action="undo"], #undoBtn').forEach(button => {
-        button.disabled = undoStack.length === 0;
-        button.textContent = undoStack.length ? `Undo (${undoStack.length})` : 'Undo';
-      });
-    }
-    function undoLastChange() {
-      if (!undoStack.length) return;
-      rows = undoStack.pop();
-      render();
-    }
-    function revisionRoundNumber(row) {
-      const match = String(row.item || '').match(/รอบ\s*(\d+)/);
-      return match ? Number(match[1]) : 0;
-    }
-    function removeAccidentalDevelopmentRounds() {
-      const firstRemoveIndex = rows.findIndex(row => row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row)));
-      if (firstRemoveIndex < 0) return;
-      rows = rows.filter(row => !(row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row))));
-      normalizeSequentialRows(firstRemoveIndex);
-    }
-    const TH_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-    const BANGKOK_TIME_ZONE = 'Asia/Bangkok';
-    function parseDate(value) {
-      if (!value) return null;
-      const parts = String(value).split('-').map(Number);
-      if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
-      return new Date(parts[0], parts[1] - 1, parts[2]);
-    }
-    function isoDate(date) {
-      if (!date) return '';
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-    function todayDate() {
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: BANGKOK_TIME_ZONE,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).formatToParts(new Date()).reduce((acc, part) => {
-        acc[part.type] = part.value;
-        return acc;
-      }, {});
-      return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
-    }
-    function setupReferenceDate() {
-      const saved = localStorage.getItem(referenceDateStorageKey);
-      referenceDateInput.value = saved || isoDate(todayDate());
-    }
-    function referenceDate() {
-      return parseDate(referenceDateInput.value) || todayDate();
-    }
-    function addDays(date, days) {
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
-    }
-    function dateOrdinal(date) {
-      return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
-    }
-    function diffDays(a, b) {
-      return dateOrdinal(b) - dateOrdinal(a);
-    }
-    function shiftDateValue(value, deltaDays) {
-      const date = parseDate(value);
-      return date && deltaDays ? isoDate(addDays(date, deltaDays)) : value;
-    }
-    function shiftRowsFrom(startIndex, deltaDays) {
-      if (!deltaDays) return;
-      for (let i = startIndex; i < rows.length; i += 1) {
-        rows[i].start = shiftDateValue(rows[i].start, deltaDays);
-        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
-      }
-    }
-    function formatShort(value) {
-      const date = parseDate(value);
-      if (!date) return '';
-      const day = String(date.getDate()).padStart(2, '0');
-      const year = String(date.getFullYear() + 543).slice(-2);
-      return `${day} ${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
-    }
-    function formatMonthYear(date) {
-      const year = String(date.getFullYear() + 543).slice(-2);
-      return `${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
-    }
-    function endDate(row) {
-      const start = parseDate(row.start);
-      const duration = durationValue(row);
-      return start ? addDays(start, duration - 1) : null;
-    }
-    function durationValue(row) {
-      return Math.max(1, Math.round(Number(row.duration) || 1));
-    }
-    function periodNumber(period) {
-      const match = String(period || '').match(/\d+/);
-      return match ? Number(match[0]) : null;
-    }
-    function isAotOneDayHandoff(row) {
-      return row.type === 'AOT' && durationValue(row) === 1;
-    }
-    function isAotPassRow(row) {
-      return row.type === 'AOT' && String(row.item || '').includes('ผ่าน');
-    }
-    function isAotExcludedFromWork(row) {
-      return isAotOneDayHandoff(row) || isAotPassRow(row);
-    }
-    function sequencingAnchorIndex(rowIndex) {
-      for (let i = rowIndex - 1; i >= 0; i -= 1) {
-        if (!isAotPassRow(rows[i])) return i;
-      }
-      return -1;
-    }
-    function normalizeSequentialRows(startIndex = 1) {
-      for (let i = Math.max(1, startIndex); i < rows.length; i += 1) {
-        const anchorIndex = sequencingAnchorIndex(i);
-        const previousEnd = anchorIndex >= 0 ? endDate(rows[anchorIndex]) : null;
-        if (!previousEnd) continue;
-        const nextStart = addDays(previousEnd, 1);
-        const nextStartValue = isoDate(nextStart);
-        if (rows[i].start === nextStartValue) continue;
-        const oldStart = parseDate(rows[i].start);
-        const deltaDays = oldStart ? diffDays(oldStart, nextStart) : 0;
-        rows[i].start = nextStartValue;
-        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
-      }
-    }
-    function alignRowsAfterPass() {
-      for (let i = 0; i < rows.length - 1; i += 1) {
-        const passRow = rows[i];
-        const nextRow = rows[i + 1];
-        if (!isAotPassRow(passRow) || nextRow.type !== 'Consultant' || nextRow.period === passRow.period) continue;
-        if (!passRow.start || nextRow.start === passRow.start) continue;
-        const oldStart = parseDate(nextRow.start);
-        const newStart = parseDate(passRow.start);
-        const deltaDays = oldStart && newStart ? diffDays(oldStart, newStart) : 0;
-        nextRow.start = passRow.start;
-        nextRow.meeting = shiftDateValue(nextRow.meeting, deltaDays);
-        normalizeSequentialRows(i + 2);
-      }
-    }
-    function syncMeetingWhenEndMoves(row, oldEnd, newEnd) {
-      const meeting = parseDate(row.meeting);
-      if (meeting && oldEnd && newEnd && diffDays(meeting, oldEnd) === 0) {
-        row.meeting = isoDate(newEnd);
-      }
-    }
-    function rowTiming(row, today) {
-      const end = endDate(row);
-      return end && end < today ? 'actual' : 'estimate';
-    }
-    function torStatus(delta) {
-      if (delta > 0) return { text: `ช้ากว่า TOR ${delta} วัน`, cls: 'late' };
-      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early' };
-      return { text: 'ตรงตาม TOR', cls: 'good' };
-    }
-    function torDaysForPeriod(period) {
-      return TOR_CUMULATIVE_DAYS_BY_PERIOD[periodNumber(period)] || TOR_CONSULTANT_DAYS;
-    }
-    function torVarianceStatus(actualDays, torDays) {
-      const delta = actualDays - torDays;
-      if (delta > 0) return { text: `ล่าช้า ${delta} วัน`, cls: 'late', delta };
-      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early', delta };
-      return { text: 'ตรงตาม TOR', cls: 'good', delta };
-    }
-    function periodRangeText(item) {
-      if (!item.consultantStart || !item.consultantEnd) return '-';
-      return `${formatShort(isoDate(item.consultantStart))} - ${formatShort(isoDate(item.consultantEnd))}`;
-    }
-    function consultantDaysThrough(today) {
-      return rows
-        .filter(row => row.type === 'Consultant')
-        .reduce((sum, row) => {
-          const start = parseDate(row.start);
-          const end = endDate(row);
-          if (!start || !end || start > today) return sum;
-          const countedEnd = end > today ? today : end;
-          return sum + Math.max(0, diffDays(start, countedEnd) + 1);
-        }, 0);
-    }
-    function currentPeriodStats(periods, today) {
-      const activeRow = rows.find(row => {
-        const start = parseDate(row.start);
-        const end = endDate(row);
-        return start && end && start <= today && today <= end;
-      });
-      if (activeRow) return periods.find(item => item.period === activeRow.period) || periods[0] || null;
-      return periods.find(item => item.earliestStart && today < item.earliestStart)
-        || periods.find(item => item.adjustedDue && today <= item.adjustedDue)
-        || periods[periods.length - 1]
-        || null;
-    }
-    function dueStatus(adjustedDue, today) {
-      if (!adjustedDue) return { text: 'ยังไม่พบกำหนดส่งใหม่', cls: '' };
-      const daysToDue = diffDays(today, adjustedDue);
-      if (daysToDue < 0) return { text: `ปัจจุบันล่าช้า ${Math.abs(daysToDue)} วัน`, cls: 'late' };
-      if (daysToDue > 0) return { text: `เหลือเวลา ${daysToDue} วันก่อนถึงกำหนด`, cls: 'good' };
-      return { text: 'ครบกำหนดส่งวันนี้', cls: 'early' };
-    }
-    function periodStats(today) {
-      const stats = [];
-      const byPeriod = new Map();
-      rows.forEach(row => {
-        if (!byPeriod.has(row.period)) {
-          byPeriod.set(row.period, {
-            period: row.period,
-            rows: [],
-            consultant: 0,
-            consultantCum: 0,
-            aot: 0,
-            aotCum: 0,
-            reserveBefore: 0,
-            aotOneDay: 0,
-            earliestStart: null,
-            latestEnd: null,
-            consultantStart: null,
-            consultantEnd: null,
-            plannedEnd: null,
-            adjustedDue: null,
-            meetingDates: [],
-            timing: 'actual'
-          });
-          stats.push(byPeriod.get(row.period));
-        }
-        const item = byPeriod.get(row.period);
-        item.rows.push(row);
-        const duration = durationValue(row);
-        if (row.type === 'Consultant') item.consultant += duration;
-        if (row.type === 'AOT') {
-          if (isAotExcludedFromWork(row)) {
-            item.aotOneDay += duration;
-          } else {
-            item.aot += duration;
-          }
-        }
-        const start = parseDate(row.start);
-        const end = endDate(row);
-        const meeting = parseDate(row.meeting);
-        if (start && (!item.earliestStart || start < item.earliestStart)) item.earliestStart = start;
-        if (end && (!item.latestEnd || end > item.latestEnd)) item.latestEnd = end;
-        if (row.type === 'Consultant') {
-          if (start && (!item.consultantStart || start < item.consultantStart)) item.consultantStart = start;
-          if (end) item.consultantEnd = end;
-        }
-        if (meeting) item.meetingDates.push(meeting);
-        if (rowTiming(row, today) === 'estimate') item.timing = 'estimate';
-      });
-      let consultantCum = 0;
-      let aotCum = 0;
-      stats.forEach(item => {
-        const plannedEnd = parseDate(plannedEndByPeriod[periodNumber(item.period)]);
-        item.reserveBefore = aotCum;
-        item.plannedEnd = plannedEnd;
-        item.adjustedDue = plannedEnd ? addDays(plannedEnd, item.reserveBefore) : null;
-        consultantCum += item.consultant;
-        aotCum += item.aot;
-        item.consultantCum = consultantCum;
-        item.aotCum = aotCum;
-      });
-      return stats;
-    }
-    function timelineBounds() {
-      const dates = [];
-      for (const row of rows) {
-        const s = parseDate(row.start);
-        const e = endDate(row);
-        const m = parseDate(row.meeting);
-        if (s) dates.push(s);
-        if (e) dates.push(e);
-        if (m) dates.push(m);
-      }
-      for (const item of periodStats(referenceDate())) {
-        if (item.plannedEnd) dates.push(item.plannedEnd);
-        if (item.adjustedDue) dates.push(item.adjustedDue);
-      }
-      const min = dates.length ? new Date(Math.min(...dates)) : new Date(2025, 7, 18);
-      const max = dates.length ? new Date(Math.max(...dates)) : new Date(2027, 4, 31);
-      min.setDate(min.getDate() - 7);
-      max.setDate(max.getDate() + 14);
-      return { min, max };
-    }
-    function position(date, min, total, width) {
-      return Math.max(0, Math.min(width, diffDays(min, date) / total * width));
-    }
-    function scalePxPerDay(step) {
-      if (step === 90) return 0.95;
-      if (step === 30) return 3.2;
-      if (step === 14) return 11;
-      return 16;
-    }
-    function minTimelineWidth(step) {
+    const storageKey = 'cra-auto-gantt-web-v4';
+
+    const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
+
+    const undoLimit = 10;
+
+    const TOR_CONSULTANT_DAYS = 365;
+
+    const TOR_CUMULATIVE_DAYS_BY_PERIOD = {
+
+      1: 30,
+
+      2: 60,
+
+      3: 120,
+
+      4: 180,
+
+      5: 270,
+
+      6: 300,
+
+      7: 365
+
+    };
+
+    const plannedEndByPeriod = {
+
+      1: '2025-09-20',
+
+      2: '2025-10-20',
+
+      3: '2025-12-19',
+
+      4: '2026-02-17',
+
+      5: '2026-05-18',
+
+      6: '2026-06-17',
+
+      7: '2026-08-21'
+
+    };
+
+    let rows = loadRows();
+
+    let undoStack = [];
+
+    let durationEditTimer = null;
+
+    removeAccidentalDevelopmentRounds();
+
+    alignRowsAfterPass();
+
+
+
+    function loadRows() {
+
+      try {
+
+        const saved = localStorage.getItem(storageKey);
+
+        return saved ? JSON.parse(saved) : structuredClone(defaultRows);
+
+      } catch (_) {
+
+        return structuredClone(defaultRows);
+
+      }
+
+    }
+
+    function saveRows() { localStorage.setItem(storageKey, JSON.stringify(rows)); }
+
+
+    const versionHistoryKey = 'cra-auto-gantt-version-history-v1';
+    const versionHistoryLimit = 3;
+    let pendingChanges = [];
+    let hasUnsavedChanges = false;
+    let lastSavedAt = localStorage.getItem(storageKey + '-last-saved-at') || '';
+    let savedRowsBaseline = structuredClone(rows);
+    const changeFieldLabels = { period: 'Period', org: 'Owner', item: 'Item', type: 'Type', start: 'Start', end: 'End', duration: 'Days', meeting: 'Meeting', status: 'Status', row: 'Row' };
+    const reviewFields = ['period', 'org', 'item', 'type', 'start', 'end', 'duration', 'meeting', 'status'];
+    function rowLabel(row, index) { if (!row) return 'Row ' + (index + 1); return (row.period || '-') + ' / ' + (row.org || '-') + ' / ' + (row.item || '-'); }
+    function rowValue(row, field) { if (!row) return ''; if (field === 'end') { const end = endDate(row); return end ? isoDate(end) : ''; } if (field === 'duration') return String(durationValue(row)); return String(row[field] || ''); }
+    function displayValue(value, field) { if (!value) return '-'; if (['start', 'end', 'meeting'].includes(field) && /^\d{4}-\d{2}-\d{2}$/.test(value)) return formatShort(value); return value; }
+    function classifyChange(change, manualContext) { if (!manualContext) return 'auto'; if (change.rowIndex !== manualContext.rowIndex) return 'auto'; if (change.field === manualContext.field) return 'manual'; if (manualContext.field === 'end' && ['end', 'duration'].includes(change.field)) return 'manual'; if (manualContext.field === 'duration' && ['duration', 'end'].includes(change.field)) return 'manual'; return 'auto'; }
+    function compareRows(beforeRows, afterRows, manualContext = null) { const max = Math.max(beforeRows.length, afterRows.length); const changes = []; for (let i = 0; i < max; i += 1) { const before = beforeRows[i]; const after = afterRows[i]; if (!before && after) { changes.push({ kind: manualContext ? 'manual' : 'auto', rowIndex: i, field: 'row', label: rowLabel(after, i), before: '-', after: 'Added row' }); continue; } if (before && !after) { changes.push({ kind: manualContext ? 'manual' : 'auto', rowIndex: i, field: 'row', label: rowLabel(before, i), before: 'Existing row', after: 'Deleted row' }); continue; } for (const field of reviewFields) { const beforeValue = rowValue(before, field); const afterValue = rowValue(after, field); if (beforeValue === afterValue) continue; const draft = { rowIndex: i, field, label: rowLabel(after || before, i), before: beforeValue, after: afterValue }; changes.push({ ...draft, kind: classifyChange(draft, manualContext) }); } } return changes; }
+    function refreshPendingFromBaseline() { pendingChanges = compareRows(savedRowsBaseline, rows, null); hasUnsavedChanges = pendingChanges.length > 0; }
+    function setPendingChanges(beforeRows, manualContext = null) { const latest = compareRows(beforeRows, rows, manualContext); const latestMap = new Map(latest.map(change => [change.rowIndex + '|' + change.field, change.kind])); pendingChanges = compareRows(savedRowsBaseline, rows, null).map(change => ({ ...change, kind: latestMap.get(change.rowIndex + '|' + change.field) || change.kind })); hasUnsavedChanges = pendingChanges.length > 0; }
+    function formatSavedAt(value) { const date = new Date(value); if (Number.isNaN(date.getTime())) return ''; return date.toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }); }
+    function updateSaveButtons() { const dirty = hasUnsavedChanges; document.querySelectorAll('#saveChangesBtn, #toolbarSaveChanges, #discardDraftBtn').forEach(button => { if (button) button.disabled = !dirty; }); const state = document.getElementById('saveState'); if (state) { state.classList.toggle('dirty', dirty); state.textContent = dirty ? 'Unsaved changes: ' + pendingChanges.length : 'Saved' + (lastSavedAt ? ' ' + formatSavedAt(lastSavedAt) : ''); } }
+    function summarizeDashboard() { const today = referenceDate(); const stats = periodStats(today); const current = currentPeriodStats(stats, today); const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0); const aot = rows.filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r)).reduce((sum, r) => sum + durationValue(r), 0); return { referenceDate: isoDate(today), currentPeriod: current ? current.period : '', consultantDays: consultant, aotReserveDays: aot }; }
+    function versionHistory() { try { return JSON.parse(localStorage.getItem(versionHistoryKey) || '[]'); } catch (_) { return []; } }
+    function saveVersionHistory(changes) { const history = versionHistory(); history.unshift({ savedAt: lastSavedAt, rows: structuredClone(rows), changes, summary: summarizeDashboard() }); localStorage.setItem(versionHistoryKey, JSON.stringify(history.slice(0, versionHistoryLimit))); }
+    function saveCurrentChanges() { const changes = pendingChanges.length ? pendingChanges : compareRows(savedRowsBaseline, rows, null); lastSavedAt = new Date().toISOString(); localStorage.setItem(storageKey + '-last-saved-at', lastSavedAt); localStorage.setItem(storageKey, JSON.stringify(rows)); saveVersionHistory(changes); savedRowsBaseline = structuredClone(rows); pendingChanges = []; hasUnsavedChanges = false; render(); }
+    function discardDraftChanges() { rows = structuredClone(savedRowsBaseline); pendingChanges = []; hasUnsavedChanges = false; render(); }
+    function exportJsonFile(filename, data) { const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href); }
+    function exportCurrentData() { exportJsonFile('CRA_Gantt_Current_Data_' + isoDate(todayDate()) + '.json', { exportedAt: new Date().toISOString(), rows, pendingChanges, summary: summarizeDashboard() }); }
+    function latestChangeReport() { const history = versionHistory(); if (pendingChanges.length) return { title: 'Draft changes not yet saved', rows: structuredClone(rows), changes: pendingChanges, savedAt: '', summary: summarizeDashboard() }; if (history.length) return { title: 'Latest saved version', rows: history[0].rows || structuredClone(rows), changes: history[0].changes || [], savedAt: history[0].savedAt || '', summary: history[0].summary || summarizeDashboard() }; return { title: 'Current data', rows: structuredClone(rows), changes: [], savedAt: lastSavedAt, summary: summarizeDashboard() }; }
+    function changeMap(changes) { const map = new Map(); changes.forEach(change => map.set(change.rowIndex + '|' + change.field, change)); return map; }
+    function reportCell(value, change) { const mark = change ? (change.kind === 'manual' ? '*' : '#') : ''; const cls = change ? ' changed ' + change.kind : ''; const title = change ? ' title="' + escapeAttr(displayValue(change.before, change.field)) + ' -> ' + escapeAttr(displayValue(change.after, change.field)) + '"' : ''; return '<td class="' + cls + '"' + title + '>' + (mark ? '<b>' + mark + '</b> ' : '') + escapeText(value || '-') + '</td>'; }
+    function reportPeriodStats(reportRows) { const stats = []; const byPeriod = new Map(); reportRows.forEach(row => { if (!byPeriod.has(row.period)) { byPeriod.set(row.period, { period: row.period, consultant: 0, consultantCum: 0, aot: 0, aotCum: 0, tor: torDaysForPeriod(row.period), variance: 0 }); stats.push(byPeriod.get(row.period)); } const item = byPeriod.get(row.period); const days = durationValue(row); if (row.type === 'Consultant') item.consultant += days; if (row.type === 'AOT' && !isAotExcludedFromWork(row)) item.aot += days; }); let consultantCum = 0; let aotCum = 0; stats.forEach(item => { consultantCum += item.consultant; aotCum += item.aot; item.consultantCum = consultantCum; item.aotCum = aotCum; item.variance = item.consultantCum - item.tor; }); return stats; }
+    function reportVarianceText(delta) { if (delta > 0) return 'Late ' + delta + ' d'; if (delta < 0) return 'Ahead ' + Math.abs(delta) + ' d'; return 'On TOR'; }
+    function reportSummaryCell(value, cls = '') { return '<td class="' + cls + '">' + escapeText(String(value ?? '-')) + '</td>'; }
+    function reportPeriodRowPositions(reportRows) { const first = new Map(); const last = new Map(); const band = new Map(); reportRows.forEach((row, index) => { if (!first.has(row.period)) { first.set(row.period, index); band.set(row.period, band.size % 2); } last.set(row.period, index); }); return { first, last, band }; }
+    function exportVersionHistory() { const report = latestChangeReport(); const changes = changeMap(report.changes); const statsByPeriod = new Map(reportPeriodStats(report.rows).map(item => [item.period, item])); const positions = reportPeriodRowPositions(report.rows); const fields = ['period', 'org', 'item', 'type', 'start', 'end', 'duration', 'meeting', 'status']; const rowsHtml = report.rows.map((row, rowIndex) => { const stats = statsByPeriod.get(row.period) || {}; const varianceCls = stats.variance > 0 ? 'late' : stats.variance < 0 ? 'early' : 'good'; const isFirstPeriodRow = positions.first.get(row.period) === rowIndex; const isLastPeriodRow = positions.last.get(row.period) === rowIndex; const detailCells = fields.map(field => { const value = field === 'period' && !isFirstPeriodRow ? '' : displayValue(rowValue(row, field), field); return reportCell(value, changes.get(rowIndex + '|' + field)); }).join(''); const summaryCells = isLastPeriodRow ? reportSummaryCell(stats.consultant || 0) + reportSummaryCell(stats.consultantCum || 0) + reportSummaryCell(stats.aot || 0) + reportSummaryCell(stats.aotCum || 0) + reportSummaryCell(stats.tor || 0) + reportSummaryCell(reportVarianceText(stats.variance || 0), varianceCls) : reportSummaryCell('') + reportSummaryCell('') + reportSummaryCell('') + reportSummaryCell('') + reportSummaryCell('') + reportSummaryCell(''); const bandClass = positions.band.get(row.period) ? ' class="period-band"' : ''; return '<tr' + bandClass + '>' + detailCells + summaryCells + '</tr>'; }).join(''); const changeHtml = report.changes.length ? report.changes.map(change => '<tr><td>' + (change.kind === 'manual' ? '*' : '#') + '</td><td>' + escapeText(change.label) + '</td><td>' + escapeText(changeFieldLabels[change.field] || change.field) + '</td><td>' + escapeText(displayValue(change.before, change.field)) + '</td><td>' + escapeText(displayValue(change.after, change.field)) + '</td></tr>').join('') : '<tr><td colspan="5">No changed cells in this export.</td></tr>'; const html = '<!doctype html><html><head><meta charset="utf-8"><title>CRA Timeline Data Report</title><style>@page{size:A4 landscape;margin:6mm}body{font-family:Arial,sans-serif;color:#0f172a;font-size:8.5px}h1{margin:0 0 4px;font-size:17px}p{margin:2px 0;color:#475569}.legend{display:flex;gap:10px;margin:7px 0 8px}.pill{border:1px solid #cbd5e1;border-radius:999px;padding:3px 7px}.manual{background:#eff6ff}.auto{background:#fffbeb}table{border-collapse:collapse;width:100%;margin-top:7px;page-break-inside:auto;table-layout:fixed}th,td{border:1px solid #dbe4ef;padding:3px 4px;text-align:left;vertical-align:top;word-break:break-word}th{background:#dbeafe;font-weight:700}.summary-head{background:#ccfbf1}tr.period-band td{background:#e0f2fe}.changed.manual{box-shadow:inset 3px 0 0 #2563eb}.changed.auto{box-shadow:inset 3px 0 0 #f59e0b}.late{color:#dc2626;font-weight:800}.early{color:#0369a1;font-weight:800}.good{color:#15803d;font-weight:800}td b{font-weight:900}.section-title{margin-top:12px;font-size:12px;font-weight:800}.w-period{width:10%}.w-item{width:9%}.w-small{width:5.3%}.w-summary{width:5%}</style></head><body><h1>CRA Timeline Data Report</h1><p>' + escapeText(report.title) + '</p><p>Exported: ' + escapeText(new Date().toLocaleString('th-TH')) + (report.savedAt ? ' | Saved: ' + escapeText(formatSavedAt(report.savedAt)) : '') + '</p><div class="legend"><span class="pill manual">* manual edit</span><span class="pill auto"># auto cascade / normalize</span></div><div class="section-title">Detailed Timeline With Contract Day Summary</div><table><thead><tr><th class="w-period">Period</th><th class="w-small">Owner</th><th class="w-item">Item</th><th class="w-small">Type</th><th class="w-small">Start</th><th class="w-small">End</th><th class="w-small">Days</th><th class="w-small">Meeting</th><th class="w-small">Status</th><th class="summary-head w-summary">Consultant / Period</th><th class="summary-head w-summary">Consultant / Cum.</th><th class="summary-head w-summary">AOT / Period</th><th class="summary-head w-summary">AOT / Cum.</th><th class="summary-head w-summary">TOR Cum.</th><th class="summary-head w-summary">Variance vs TOR</th></tr></thead><tbody>' + rowsHtml + '</tbody></table><div class="section-title">Changed Cell Summary</div><table><thead><tr><th>Mark</th><th>Row</th><th>Field</th><th>Before</th><th>After</th></tr></thead><tbody>' + changeHtml + '</tbody></table></body></html>'; const reportWindow = window.open('', '_blank'); if (!reportWindow) { alert('Please allow pop-ups to export the PDF report.'); return; } reportWindow.document.open(); reportWindow.document.write(html); reportWindow.document.close(); reportWindow.focus(); setTimeout(() => reportWindow.print(), 300); }
+    function renderChangeReview() { if (!changeReview) return; const items = pendingChanges.slice(0, 30).map(change => '<div class="change-item"><span class="change-symbol ' + change.kind + '">' + (change.kind === 'manual' ? '*' : '#') + '</span><span>' + escapeText(change.label) + '</span><span class="change-field">' + escapeText(changeFieldLabels[change.field] || change.field) + '</span><span>' + escapeText(displayValue(change.before, change.field)) + ' &rarr; ' + escapeText(displayValue(change.after, change.field)) + '</span></div>').join(''); changeReview.innerHTML = '<div class="change-review-head"><div><div class="change-review-title">Review changes before save</div><div class="change-review-note">* = manual edit, # = auto cascade/normalize from the system</div></div><div class="editor-actions"><button id="saveChangesBtn" class="primary" type="button" ' + (hasUnsavedChanges ? '' : 'disabled') + '>Save Data</button><button id="discardDraftBtn" class="quiet" type="button" ' + (hasUnsavedChanges ? '' : 'disabled') + '>Discard Draft</button><button id="exportHistoryBtn" class="quiet" type="button">Export History</button></div></div><div class="change-list">' + (items || '<div class="change-empty">No unsaved data changes.</div>') + '</div>'; }
+    function cellChange(rowIndex, field) { return pendingChanges.find(change => change.rowIndex === rowIndex && change.field === field); }
+    function applyChangeMarkers() { const tableRows = editor.querySelectorAll('tbody tr'); const columns = { type: 3, start: 4, end: 5, duration: 6, meeting: 7 }; tableRows.forEach((tr, rowIndex) => { Object.entries(columns).forEach(([field, colIndex]) => { const change = cellChange(rowIndex, field); if (!change) return; const td = tr.children[colIndex]; if (!td) return; td.classList.add(change.kind === 'manual' ? 'cell-manual' : 'cell-auto'); if (!td.querySelector('.change-cell-marker')) { const marker = document.createElement('span'); marker.className = 'change-cell-marker ' + change.kind; marker.textContent = change.kind === 'manual' ? '*' : '#'; marker.title = (change.kind === 'manual' ? 'Manual edit: ' : 'Auto cascade: ') + displayValue(change.before, field) + ' -> ' + displayValue(change.after, field); td.prepend(marker); } }); }); }
+
+    function cloneRows() { return structuredClone(rows); }
+
+    function pushUndo() {
+
+      undoStack.push(cloneRows());
+
+      if (undoStack.length > undoLimit) undoStack.shift();
+
+      updateUndoButtons();
+
+    }
+
+    function updateUndoButtons() {
+
+      document.querySelectorAll('[data-action="undo"], #undoBtn').forEach(button => {
+
+        button.disabled = undoStack.length === 0;
+
+        button.textContent = undoStack.length ? `Undo (${undoStack.length})` : 'Undo';
+
+      });
+
+    }
+
+    function undoLastChange() {
+
+      if (!undoStack.length) return;
+
+      rows = undoStack.pop();
+
+      pendingChanges = compareRows(savedRowsBaseline, rows, null);
+      hasUnsavedChanges = pendingChanges.length > 0;
+
+      render();
+
+    }
+
+    function revisionRoundNumber(row) {
+
+      const match = String(row.item || '').match(/รอบ\s*(\d+)/);
+
+      return match ? Number(match[1]) : 0;
+
+    }
+
+    function removeAccidentalDevelopmentRounds() {
+
+      const firstRemoveIndex = rows.findIndex(row => row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row)));
+
+      if (firstRemoveIndex < 0) return;
+
+      rows = rows.filter(row => !(row.period === 'งวด 4 Development' && [4, 5].includes(revisionRoundNumber(row))));
+
+      normalizeSequentialRows(firstRemoveIndex);
+
+    }
+
+    const TH_MONTHS_SHORT = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+
+    const BANGKOK_TIME_ZONE = 'Asia/Bangkok';
+
+    function parseDate(value) {
+
+      if (!value) return null;
+
+      const parts = String(value).split('-').map(Number);
+
+      if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+
+    }
+
+    function isoDate(date) {
+
+      if (!date) return '';
+
+      const y = date.getFullYear();
+
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+
+      const d = String(date.getDate()).padStart(2, '0');
+
+      return `${y}-${m}-${d}`;
+
+    }
+
+    function todayDate() {
+
+      const parts = new Intl.DateTimeFormat('en-CA', {
+
+        timeZone: BANGKOK_TIME_ZONE,
+
+        year: 'numeric',
+
+        month: '2-digit',
+
+        day: '2-digit'
+
+      }).formatToParts(new Date()).reduce((acc, part) => {
+
+        acc[part.type] = part.value;
+
+        return acc;
+
+      }, {});
+
+      return parseDate(`${parts.year}-${parts.month}-${parts.day}`);
+
+    }
+
+    function setupReferenceDate() {
+
+      const saved = localStorage.getItem(referenceDateStorageKey);
+
+      referenceDateInput.value = saved || isoDate(todayDate());
+
+    }
+
+    function referenceDate() {
+
+      return parseDate(referenceDateInput.value) || todayDate();
+
+    }
+
+    function addDays(date, days) {
+
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+    }
+
+    function dateOrdinal(date) {
+
+      return Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+
+    }
+
+    function diffDays(a, b) {
+
+      return dateOrdinal(b) - dateOrdinal(a);
+
+    }
+
+    function shiftDateValue(value, deltaDays) {
+
+      const date = parseDate(value);
+
+      return date && deltaDays ? isoDate(addDays(date, deltaDays)) : value;
+
+    }
+
+    function shiftRowsFrom(startIndex, deltaDays) {
+
+      if (!deltaDays) return;
+
+      for (let i = startIndex; i < rows.length; i += 1) {
+
+        rows[i].start = shiftDateValue(rows[i].start, deltaDays);
+
+        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
+
+      }
+
+    }
+
+    function formatShort(value) {
+
+      const date = parseDate(value);
+
+      if (!date) return '';
+
+      const day = String(date.getDate()).padStart(2, '0');
+
+      const year = String(date.getFullYear() + 543).slice(-2);
+
+      return `${day} ${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
+
+    }
+
+    function formatMonthYear(date) {
+
+      const year = String(date.getFullYear() + 543).slice(-2);
+
+      return `${TH_MONTHS_SHORT[date.getMonth()]} ${year}`;
+
+    }
+
+    function endDate(row) {
+
+      const start = parseDate(row.start);
+
+      const duration = durationValue(row);
+
+      return start ? addDays(start, duration - 1) : null;
+
+    }
+
+    function durationValue(row) {
+
+      return Math.max(1, Math.round(Number(row.duration) || 1));
+
+    }
+
+    function periodNumber(period) {
+
+      const match = String(period || '').match(/\d+/);
+
+      return match ? Number(match[0]) : null;
+
+    }
+
+    function isAotOneDayHandoff(row) {
+
+      return row.type === 'AOT' && durationValue(row) === 1;
+
+    }
+
+    function isAotPassRow(row) {
+
+      return row.type === 'AOT' && String(row.item || '').includes('ผ่าน');
+
+    }
+
+    function isAotExcludedFromWork(row) {
+
+      return isAotOneDayHandoff(row) || isAotPassRow(row);
+
+    }
+
+    function sequencingAnchorIndex(rowIndex) {
+
+      for (let i = rowIndex - 1; i >= 0; i -= 1) {
+
+        if (!isAotPassRow(rows[i])) return i;
+
+      }
+
+      return -1;
+
+    }
+
+    function normalizeSequentialRows(startIndex = 1) {
+
+      for (let i = Math.max(1, startIndex); i < rows.length; i += 1) {
+
+        const anchorIndex = sequencingAnchorIndex(i);
+
+        const previousEnd = anchorIndex >= 0 ? endDate(rows[anchorIndex]) : null;
+
+        if (!previousEnd) continue;
+
+        const nextStart = addDays(previousEnd, 1);
+
+        const nextStartValue = isoDate(nextStart);
+
+        if (rows[i].start === nextStartValue) continue;
+
+        const oldStart = parseDate(rows[i].start);
+
+        const deltaDays = oldStart ? diffDays(oldStart, nextStart) : 0;
+
+        rows[i].start = nextStartValue;
+
+        rows[i].meeting = shiftDateValue(rows[i].meeting, deltaDays);
+
+      }
+
+    }
+
+    function alignRowsAfterPass() {
+
+      for (let i = 0; i < rows.length - 1; i += 1) {
+
+        const passRow = rows[i];
+
+        const nextRow = rows[i + 1];
+
+        if (!isAotPassRow(passRow) || nextRow.type !== 'Consultant' || nextRow.period === passRow.period) continue;
+
+        if (!passRow.start || nextRow.start === passRow.start) continue;
+
+        const oldStart = parseDate(nextRow.start);
+
+        const newStart = parseDate(passRow.start);
+
+        const deltaDays = oldStart && newStart ? diffDays(oldStart, newStart) : 0;
+
+        nextRow.start = passRow.start;
+
+        nextRow.meeting = shiftDateValue(nextRow.meeting, deltaDays);
+
+        normalizeSequentialRows(i + 2);
+
+      }
+
+    }
+
+    function syncMeetingWhenEndMoves(row, oldEnd, newEnd) {
+
+      const meeting = parseDate(row.meeting);
+
+      if (meeting && oldEnd && newEnd && diffDays(meeting, oldEnd) === 0) {
+
+        row.meeting = isoDate(newEnd);
+
+      }
+
+    }
+
+    function rowTiming(row, today) {
+
+      const end = endDate(row);
+
+      return end && end < today ? 'actual' : 'estimate';
+
+    }
+
+    function torStatus(delta) {
+
+      if (delta > 0) return { text: `ช้ากว่า TOR ${delta} วัน`, cls: 'late' };
+
+      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early' };
+
+      return { text: 'ตรงตาม TOR', cls: 'good' };
+
+    }
+
+    function torDaysForPeriod(period) {
+
+      return TOR_CUMULATIVE_DAYS_BY_PERIOD[periodNumber(period)] || TOR_CONSULTANT_DAYS;
+
+    }
+
+    function torVarianceStatus(actualDays, torDays) {
+
+      const delta = actualDays - torDays;
+
+      if (delta > 0) return { text: `ล่าช้า ${delta} วัน`, cls: 'late', delta };
+
+      if (delta < 0) return { text: `เร็วกว่า TOR ${Math.abs(delta)} วัน`, cls: 'early', delta };
+
+      return { text: 'ตรงตาม TOR', cls: 'good', delta };
+
+    }
+
+    function periodRangeText(item) {
+
+      if (!item.consultantStart || !item.consultantEnd) return '-';
+
+      return `${formatShort(isoDate(item.consultantStart))} - ${formatShort(isoDate(item.consultantEnd))}`;
+
+    }
+
+    function consultantDaysThrough(today) {
+
+      return rows
+
+        .filter(row => row.type === 'Consultant')
+
+        .reduce((sum, row) => {
+
+          const start = parseDate(row.start);
+
+          const end = endDate(row);
+
+          if (!start || !end || start > today) return sum;
+
+          const countedEnd = end > today ? today : end;
+
+          return sum + Math.max(0, diffDays(start, countedEnd) + 1);
+
+        }, 0);
+
+    }
+
+    function currentPeriodStats(periods, today) {
+
+      const activeRow = rows.find(row => {
+
+        const start = parseDate(row.start);
+
+        const end = endDate(row);
+
+        return start && end && start <= today && today <= end;
+
+      });
+
+      if (activeRow) return periods.find(item => item.period === activeRow.period) || periods[0] || null;
+
+      return periods.find(item => item.earliestStart && today < item.earliestStart)
+
+        || periods.find(item => item.adjustedDue && today <= item.adjustedDue)
+
+        || periods[periods.length - 1]
+
+        || null;
+
+    }
+
+    function dueStatus(adjustedDue, today) {
+
+      if (!adjustedDue) return { text: 'ยังไม่พบกำหนดส่งใหม่', cls: '' };
+
+      const daysToDue = diffDays(today, adjustedDue);
+
+      if (daysToDue < 0) return { text: `ปัจจุบันล่าช้า ${Math.abs(daysToDue)} วัน`, cls: 'late' };
+
+      if (daysToDue > 0) return { text: `เหลือเวลา ${daysToDue} วันก่อนถึงกำหนด`, cls: 'good' };
+
+      return { text: 'ครบกำหนดส่งวันนี้', cls: 'early' };
+
+    }
+
+    function periodStats(today) {
+
+      const stats = [];
+
+      const byPeriod = new Map();
+
+      rows.forEach(row => {
+
+        if (!byPeriod.has(row.period)) {
+
+          byPeriod.set(row.period, {
+
+            period: row.period,
+
+            rows: [],
+
+            consultant: 0,
+
+            consultantCum: 0,
+
+            aot: 0,
+
+            aotCum: 0,
+
+            reserveBefore: 0,
+
+            aotOneDay: 0,
+
+            earliestStart: null,
+
+            latestEnd: null,
+
+            consultantStart: null,
+
+            consultantEnd: null,
+
+            plannedEnd: null,
+
+            adjustedDue: null,
+
+            meetingDates: [],
+
+            timing: 'actual'
+
+          });
+
+          stats.push(byPeriod.get(row.period));
+
+        }
+
+        const item = byPeriod.get(row.period);
+
+        item.rows.push(row);
+
+        const duration = durationValue(row);
+
+        if (row.type === 'Consultant') item.consultant += duration;
+
+        if (row.type === 'AOT') {
+
+          if (isAotExcludedFromWork(row)) {
+
+            item.aotOneDay += duration;
+
+          } else {
+
+            item.aot += duration;
+
+          }
+
+        }
+
+        const start = parseDate(row.start);
+
+        const end = endDate(row);
+
+        const meeting = parseDate(row.meeting);
+
+        if (start && (!item.earliestStart || start < item.earliestStart)) item.earliestStart = start;
+
+        if (end && (!item.latestEnd || end > item.latestEnd)) item.latestEnd = end;
+
+        if (row.type === 'Consultant') {
+
+          if (start && (!item.consultantStart || start < item.consultantStart)) item.consultantStart = start;
+
+          if (end) item.consultantEnd = end;
+
+        }
+
+        if (meeting) item.meetingDates.push(meeting);
+
+        if (rowTiming(row, today) === 'estimate') item.timing = 'estimate';
+
+      });
+
+      let consultantCum = 0;
+
+      let aotCum = 0;
+
+      stats.forEach(item => {
+
+        const plannedEnd = parseDate(plannedEndByPeriod[periodNumber(item.period)]);
+
+        item.reserveBefore = aotCum;
+
+        item.plannedEnd = plannedEnd;
+
+        item.adjustedDue = plannedEnd ? addDays(plannedEnd, item.reserveBefore) : null;
+
+        consultantCum += item.consultant;
+
+        aotCum += item.aot;
+
+        item.consultantCum = consultantCum;
+
+        item.aotCum = aotCum;
+
+      });
+
+      return stats;
+
+    }
+
+    function timelineBounds() {
+
+      const dates = [];
+
+      for (const row of rows) {
+
+        const s = parseDate(row.start);
+
+        const e = endDate(row);
+
+        const m = parseDate(row.meeting);
+
+        if (s) dates.push(s);
+
+        if (e) dates.push(e);
+
+        if (m) dates.push(m);
+
+      }
+
+      for (const item of periodStats(referenceDate())) {
+
+        if (item.plannedEnd) dates.push(item.plannedEnd);
+
+        if (item.adjustedDue) dates.push(item.adjustedDue);
+
+      }
+
+      const min = dates.length ? new Date(Math.min(...dates)) : new Date(2025, 7, 18);
+
+      const max = dates.length ? new Date(Math.max(...dates)) : new Date(2027, 4, 31);
+
+      min.setDate(min.getDate() - 7);
+
+      max.setDate(max.getDate() + 14);
+
+      return { min, max };
+
+    }
+
+    function position(date, min, total, width) {
+
+      return Math.max(0, Math.min(width, diffDays(min, date) / total * width));
+
+    }
+
+    function scalePxPerDay(step) {
+
+      if (step === 90) return 0.95;
+
+      if (step === 30) return 3.2;
+
+      if (step === 14) return 11;
+
+      return 16;
+
+    }
+
+    function minTimelineWidth(step) {
+
       if (step === 90) return 620;
 
       if (step === 30) return 760;
 
-      return 980;
-    }
-    function nextTickDate(date, step) {
-      if (step === 90) return new Date(date.getFullYear(), date.getMonth() + 3, 1);
-      return addDays(date, step);
-    }
-    function escapeAttr(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
-    }
-    function escapeText(value) {
-      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-    }
-    function makeInput(rowIndex, field, type = 'text') {
-      const row = rows[rowIndex];
-      return `<input data-row="${rowIndex}" data-field="${field}" type="${type}" value="${escapeAttr(row[field] ?? '')}">`;
-    }
-    function makeTypeSelect(rowIndex) {
-      const value = rows[rowIndex].type === 'AOT' ? 'AOT' : 'Consultant';
-      return `
-        <select data-row="${rowIndex}" data-field="type" title="ประเภทงาน">
-          <option value="Consultant"${value === 'Consultant' ? ' selected' : ''}>Consultant</option>
-          <option value="AOT"${value === 'AOT' ? ' selected' : ''}>AOT</option>
-        </select>`;
-    }
-    function renderSummary() {
-      const today = referenceDate();
-      const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0);
-      const aotReview = rows
-        .filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r))
-        .reduce((sum, r) => sum + durationValue(r), 0);
-      const aotOneDay = rows.filter(isAotExcludedFromWork).reduce((sum, r) => sum + durationValue(r), 0);
-      const aotRaw = aotReview + aotOneDay;
-      const aot = aotReview;
-      const periods = periodStats(today);
-      const currentPeriod = currentPeriodStats(periods, today);
-      const consultantToDate = consultantDaysThrough(today);
-      const variance = consultant - TOR_CONSULTANT_DAYS;
-      const tor = torStatus(variance);
-      const currentTorDays = currentPeriod ? torDaysForPeriod(currentPeriod.period) : TOR_CONSULTANT_DAYS;
-      const currentTor = torVarianceStatus(consultantToDate, currentTorDays);
-      summary.innerHTML = `
-        <div class="metric"><b>ข้อมูล ณ วันที่ ${formatShort(isoDate(today))}</b><span>อยู่ระหว่างการส่งงาน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
-        <div class="metric ${currentTor.cls}"><b>${consultantToDate} / ${currentTorDays} วัน</b><span>จำนวนวันทำงานของ ทปษ. ณ ปัจจุบัน เทียบ TOR ${currentPeriod ? escapeText(currentPeriod.period) : ''}<br>${currentTor.text}</span></div>
-        <div class="metric"><b>${currentPeriod ? escapeText(currentPeriod.period) : '-'}: ${currentPeriod?.adjustedDue ? formatShort(isoDate(currentPeriod.adjustedDue)) : '-'}</b><span>กำหนดส่งงานใหม่ หลังรวมวันสงวนสิทธิ์</span></div>
-        <div class="metric ${tor.cls}"><b>${consultant} / ${TOR_CONSULTANT_DAYS} วัน</b><span>จำนวนวันทำงาน ทปษ. (คาดการณ์): ${tor.text}</span></div>
-        <div class="metric"><b>${currentPeriod ? currentPeriod.reserveBefore : 0} วัน</b><span>วันสงวนสิทธิ์ถึงปัจจุบัน (realized)<br>นับถึงก่อน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
-      `;
-    }
+      return 980;
+
+    }
+
+    function nextTickDate(date, step) {
+
+      if (step === 90) return new Date(date.getFullYear(), date.getMonth() + 3, 1);
+
+      return addDays(date, step);
+
+    }
+
+    function escapeAttr(value) {
+
+      return String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
+
+    }
+
+    function escapeText(value) {
+
+      return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+    }
+
+    function makeInput(rowIndex, field, type = 'text') {
+
+      const row = rows[rowIndex];
+
+      return `<input data-row="${rowIndex}" data-field="${field}" type="${type}" value="${escapeAttr(row[field] ?? '')}">`;
+
+    }
+
+    function makeTypeSelect(rowIndex) {
+
+      const value = rows[rowIndex].type === 'AOT' ? 'AOT' : 'Consultant';
+
+      return `
+
+        <select data-row="${rowIndex}" data-field="type" title="ประเภทงาน">
+
+          <option value="Consultant"${value === 'Consultant' ? ' selected' : ''}>Consultant</option>
+
+          <option value="AOT"${value === 'AOT' ? ' selected' : ''}>AOT</option>
+
+        </select>`;
+
+    }
+
+    function renderSummary() {
+
+      const today = referenceDate();
+
+      const consultant = rows.filter(r => r.type === 'Consultant').reduce((sum, r) => sum + durationValue(r), 0);
+
+      const aotReview = rows
+
+        .filter(r => r.type === 'AOT' && !isAotExcludedFromWork(r))
+
+        .reduce((sum, r) => sum + durationValue(r), 0);
+
+      const aotOneDay = rows.filter(isAotExcludedFromWork).reduce((sum, r) => sum + durationValue(r), 0);
+
+      const aotRaw = aotReview + aotOneDay;
+
+      const aot = aotReview;
+
+      const periods = periodStats(today);
+
+      const currentPeriod = currentPeriodStats(periods, today);
+
+      const consultantToDate = consultantDaysThrough(today);
+
+      const variance = consultant - TOR_CONSULTANT_DAYS;
+
+      const tor = torStatus(variance);
+
+      const currentTorDays = currentPeriod ? torDaysForPeriod(currentPeriod.period) : TOR_CONSULTANT_DAYS;
+
+      const currentTor = torVarianceStatus(consultantToDate, currentTorDays);
+
+      summary.innerHTML = `
+
+        <div class="metric"><b>ข้อมูล ณ วันที่ ${formatShort(isoDate(today))}</b><span>อยู่ระหว่างการส่งงาน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
+
+        <div class="metric ${currentTor.cls}"><b>${consultantToDate} / ${currentTorDays} วัน</b><span>จำนวนวันทำงานของ ทปษ. ณ ปัจจุบัน เทียบ TOR ${currentPeriod ? escapeText(currentPeriod.period) : ''}<br>${currentTor.text}</span></div>
+
+        <div class="metric"><b>${currentPeriod ? escapeText(currentPeriod.period) : '-'}: ${currentPeriod?.adjustedDue ? formatShort(isoDate(currentPeriod.adjustedDue)) : '-'}</b><span>กำหนดส่งงานใหม่ หลังรวมวันสงวนสิทธิ์</span></div>
+
+        <div class="metric ${tor.cls}"><b>${consultant} / ${TOR_CONSULTANT_DAYS} วัน</b><span>จำนวนวันทำงาน ทปษ. (คาดการณ์): ${tor.text}</span></div>
+
+        <div class="metric"><b>${currentPeriod ? currentPeriod.reserveBefore : 0} วัน</b><span>วันสงวนสิทธิ์ถึงปัจจุบัน (realized)<br>นับถึงก่อน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
+
+      `;
+
+    }
+
     function renderContractSummary() {
 
       const today = referenceDate();
@@ -1647,155 +3021,310 @@
 
     }
 
-    function renderEditor() {
-      const today = referenceDate();
-      const stats = periodStats(today);
-      const periodCount = stats.length;
-      const currentPeriod = currentPeriodStats(stats, today);
-      const periodOptions = stats.map(item => `<option value="${escapeAttr(item.period)}"${currentPeriod && currentPeriod.period === item.period ? ' selected' : ''}>${escapeText(item.period)}</option>`).join('');
-      const toolbarRevisionPeriod = document.getElementById('toolbarRevisionPeriod');
-      if (toolbarRevisionPeriod) toolbarRevisionPeriod.innerHTML = periodOptions;
-      const body = rows.map((row, index) => {
-        const end = endDate(row);
-        const rowStart = parseDate(row.start);
-        const isCurrentWorkRow = rowStart && end && today >= rowStart && today <= end;
-        const timing = rowTiming(row, today);
-        const typeValue = row.type === 'AOT' ? 'AOT' : 'Consultant';
-        return `
-          <tr class="${isCurrentWorkRow ? 'current-work-row' : ''}">
-            <td class="editor-period" title="${escapeAttr(row.period)}">${escapeText(row.period)}</td>
-            <td>${escapeText(row.org)}</td>
-            <td>${escapeText(row.item)}</td>
-            <td>
-              <select data-row="${index}" data-field="type" aria-label="ประเภทงาน">
-                <option value="Consultant"${typeValue === 'Consultant' ? ' selected' : ''}>Consultant</option>
-                <option value="AOT"${typeValue === 'AOT' ? ' selected' : ''}>AOT</option>
-              </select>
-            </td>
-            <td><input data-row="${index}" data-field="start" type="date" value="${escapeAttr(row.start || '')}" aria-label="วันเริ่ม"></td>
-            <td><input data-row="${index}" data-field="end" type="date" value="${end ? isoDate(end) : ''}" aria-label="วันสิ้นสุด"></td>
-            <td><input data-row="${index}" data-field="duration" type="number" min="1" step="1" value="${durationValue(row)}" aria-label="จำนวนวัน"></td>
-            <td><input data-row="${index}" data-field="meeting" type="date" value="${escapeAttr(row.meeting || '')}" aria-label="วันประชุมตรวจรับ"></td>
-            <td><span class="timing-pill ${timing}">${timing === 'actual' ? 'Actual' : 'Estimate'}</span></td>
-          </tr>`;
-      }).join('');
-      editor.innerHTML = `
-        <div class="editor-head">
-          <h2>ตารางปรับวันที่</h2>
-          <div class="editor-actions">
-            <button data-action="undo" class="quiet" type="button" disabled>Undo</button>
-            <select id="revisionPeriod" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข">${periodOptions}</select>
-            <button id="addRevisionRound" type="button">เพิ่มรอบแก้ไข</button>
-            <button id="removeRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
-            <div class="editor-meta">${periodCount} งวด / ${rows.length} ช่วงงาน</div>
-          </div>
-        </div>
-        <div class="editor-table-wrap">
-          <table class="editor-table">
-            <colgroup>
-              <col style="width: 220px">
-              <col style="width: 92px">
-              <col style="width: 190px">
-              <col style="width: 124px">
-              <col style="width: 142px">
-              <col style="width: 142px">
-              <col style="width: 96px">
-              <col style="width: 154px">
-              <col style="width: 110px">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>งวด</th>
-                <th>หน่วยงาน</th>
-                <th>รายการ</th>
-                <th>ประเภท</th>
-                <th>วันเริ่ม</th>
-                <th>วันสิ้นสุด</th>
-                <th class="number">จำนวนวัน</th>
-                <th>ประชุมตรวจรับ</th>
-                <th>สถานะ</th>
-              </tr>
-            </thead>
-            <tbody>${body}</tbody>
-          </table>
-        </div>`;
-    }
-    function nextRevisionRound(period) {
-      return rows
-        .filter(row => row.period === period)
-        .map(row => String(row.item || '').match(/รอบ\s*(\d+)/))
-        .filter(Boolean)
-        .reduce((max, match) => Math.max(max, Number(match[1]) || 0), 0) + 1;
-    }
-    function addRevisionRound(period) {
-      const indexes = rows.map((row, index) => row.period === period ? index : -1).filter(index => index >= 0);
-      if (!indexes.length) return;
-      const insertAt = Math.max(...indexes) + 1;
-      const lastIndex = insertAt - 1;
-      const lastEnd = endDate(rows[lastIndex]) || referenceDate();
-      const round = nextRevisionRound(period);
-      const consultantDuration = 7;
-      const aotDuration = 14;
-      const consultantStart = addDays(lastEnd, 1);
-      const aotStart = addDays(consultantStart, consultantDuration);
-      rows.splice(insertAt, 0,
-        {
-          period,
-          org: 'ที่ปรึกษา',
-          item: `รอบ ${round}`,
-          type: 'Consultant',
-          start: isoDate(consultantStart),
-          duration: consultantDuration,
-          meeting: '',
-          status: 'Estimate'
-        },
-        {
-          period,
-          org: 'ทอท.',
-          item: `พิจารณา รอบ ${round}`,
-          type: 'AOT',
-          start: isoDate(aotStart),
-          duration: aotDuration,
-          meeting: '',
-          status: 'Estimate'
-        }
-      );
-      normalizeSequentialRows(insertAt + 2);
-      render();
-    }
-    function removeLatestRevisionRound(period) {
-      const rounds = rows
-        .filter(row => row.period === period)
-        .map(revisionRoundNumber)
-        .filter(round => round > 2);
-      if (!rounds.length) return;
-      const round = Math.max(...rounds);
-      const indexes = rows
-        .map((row, index) => row.period === period && revisionRoundNumber(row) === round && row.status !== 'Actual' ? index : -1)
-        .filter(index => index >= 0);
-      if (!indexes.length) return;
-      pushUndo();
-      const firstRemoveIndex = Math.min(...indexes);
-      rows = rows.filter((_, index) => !indexes.includes(index));
-      normalizeSequentialRows(firstRemoveIndex);
-      render();
-    }
-    function render() {
-      saveRows();
-      renderSummary();
-      renderContractSummary();
-      const step = Number(scale.value) || 7;
-      const isQuarter = step === 90;
-      document.documentElement.classList.toggle('quarter-scale', isQuarter);
-      const { min, max } = timelineBounds();
-      const totalDays = Math.max(1, diffDays(min, max));
-      const pxPerDay = scalePxPerDay(step);
-      const labelWidth = 556;
-      const isPdfPrint = document.body.classList.contains('pdf-print');
-      const targetBoardWidth = isPdfPrint ? 1480 : Math.max(0, window.innerWidth - 48);
-      const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
-      const timelineWidth = Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
-      const today = referenceDate();
+    function renderEditor() {
+
+      const today = referenceDate();
+
+      const stats = periodStats(today);
+
+      const periodCount = stats.length;
+
+      const currentPeriod = currentPeriodStats(stats, today);
+
+      const periodOptions = stats.map(item => `<option value="${escapeAttr(item.period)}"${currentPeriod && currentPeriod.period === item.period ? ' selected' : ''}>${escapeText(item.period)}</option>`).join('');
+
+      const toolbarRevisionPeriod = document.getElementById('toolbarRevisionPeriod');
+
+      if (toolbarRevisionPeriod) toolbarRevisionPeriod.innerHTML = periodOptions;
+
+      const body = rows.map((row, index) => {
+
+        const end = endDate(row);
+
+        const rowStart = parseDate(row.start);
+
+        const isCurrentWorkRow = rowStart && end && today >= rowStart && today <= end;
+
+        const timing = rowTiming(row, today);
+
+        const typeValue = row.type === 'AOT' ? 'AOT' : 'Consultant';
+
+        return `
+
+          <tr class="${isCurrentWorkRow ? 'current-work-row' : ''}">
+
+            <td class="editor-period" title="${escapeAttr(row.period)}">${escapeText(row.period)}</td>
+
+            <td>${escapeText(row.org)}</td>
+
+            <td>${escapeText(row.item)}</td>
+
+            <td>
+
+              <select data-row="${index}" data-field="type" aria-label="ประเภทงาน">
+
+                <option value="Consultant"${typeValue === 'Consultant' ? ' selected' : ''}>Consultant</option>
+
+                <option value="AOT"${typeValue === 'AOT' ? ' selected' : ''}>AOT</option>
+
+              </select>
+
+            </td>
+
+            <td><input data-row="${index}" data-field="start" type="date" value="${escapeAttr(row.start || '')}" aria-label="วันเริ่ม"></td>
+
+            <td><input data-row="${index}" data-field="end" type="date" value="${end ? isoDate(end) : ''}" aria-label="วันสิ้นสุด"></td>
+
+            <td><input data-row="${index}" data-field="duration" type="number" min="1" step="1" value="${durationValue(row)}" aria-label="จำนวนวัน"></td>
+
+            <td><input data-row="${index}" data-field="meeting" type="date" value="${escapeAttr(row.meeting || '')}" aria-label="วันประชุมตรวจรับ"></td>
+
+            <td><span class="timing-pill ${timing}">${timing === 'actual' ? 'Actual' : 'Estimate'}</span></td>
+
+          </tr>`;
+
+      }).join('');
+
+      editor.innerHTML = `
+
+        <div class="editor-head">
+
+          <h2>ตารางปรับวันที่</h2>
+
+          <div class="editor-actions">
+
+            <button data-action="undo" class="quiet" type="button" disabled>Undo</button>
+
+            <select id="revisionPeriod" title="เลือกงวดสำหรับเพิ่ม/ลบรอบแก้ไข">${periodOptions}</select>
+
+            <button id="addRevisionRound" type="button">เพิ่มรอบแก้ไข</button>
+
+            <button id="removeRevisionRound" class="danger" type="button">ลบรอบแก้ไขล่าสุด</button>
+
+            <div class="editor-meta">${periodCount} งวด / ${rows.length} ช่วงงาน</div>
+
+          </div>
+
+        </div>
+
+        <div class="editor-table-wrap">
+
+          <table class="editor-table">
+
+            <colgroup>
+
+              <col style="width: 220px">
+
+              <col style="width: 92px">
+
+              <col style="width: 190px">
+
+              <col style="width: 124px">
+
+              <col style="width: 142px">
+
+              <col style="width: 142px">
+
+              <col style="width: 96px">
+
+              <col style="width: 154px">
+
+              <col style="width: 110px">
+
+            </colgroup>
+
+            <thead>
+
+              <tr>
+
+                <th>งวด</th>
+
+                <th>หน่วยงาน</th>
+
+                <th>รายการ</th>
+
+                <th>ประเภท</th>
+
+                <th>วันเริ่ม</th>
+
+                <th>วันสิ้นสุด</th>
+
+                <th class="number">จำนวนวัน</th>
+
+                <th>ประชุมตรวจรับ</th>
+
+                <th>สถานะ</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>${body}</tbody>
+
+          </table>
+
+        </div>`;
+
+    }
+
+    function nextRevisionRound(period) {
+
+      return rows
+
+        .filter(row => row.period === period)
+
+        .map(row => String(row.item || '').match(/รอบ\s*(\d+)/))
+
+        .filter(Boolean)
+
+        .reduce((max, match) => Math.max(max, Number(match[1]) || 0), 0) + 1;
+
+    }
+
+    function addRevisionRound(period) {
+
+      const beforeRows = structuredClone(rows);
+      pushUndo();
+
+      const indexes = rows.map((row, index) => row.period === period ? index : -1).filter(index => index >= 0);
+
+      if (!indexes.length) return;
+
+      const insertAt = Math.max(...indexes) + 1;
+
+      const lastIndex = insertAt - 1;
+
+      const lastEnd = endDate(rows[lastIndex]) || referenceDate();
+
+      const round = nextRevisionRound(period);
+
+      const consultantDuration = 7;
+
+      const aotDuration = 14;
+
+      const consultantStart = addDays(lastEnd, 1);
+
+      const aotStart = addDays(consultantStart, consultantDuration);
+
+      rows.splice(insertAt, 0,
+
+        {
+
+          period,
+
+          org: 'ที่ปรึกษา',
+
+          item: `รอบ ${round}`,
+
+          type: 'Consultant',
+
+          start: isoDate(consultantStart),
+
+          duration: consultantDuration,
+
+          meeting: '',
+
+          status: 'Estimate'
+
+        },
+
+        {
+
+          period,
+
+          org: 'ทอท.',
+
+          item: `พิจารณา รอบ ${round}`,
+
+          type: 'AOT',
+
+          start: isoDate(aotStart),
+
+          duration: aotDuration,
+
+          meeting: '',
+
+          status: 'Estimate'
+
+        }
+
+      );
+
+      normalizeSequentialRows(insertAt + 2);
+
+      setPendingChanges(beforeRows, { rowIndex: insertAt, field: 'row' });
+
+      render();
+
+    }
+
+    function removeLatestRevisionRound(period) {
+
+      const rounds = rows
+
+        .filter(row => row.period === period)
+
+        .map(revisionRoundNumber)
+
+        .filter(round => round > 2);
+
+      if (!rounds.length) return;
+
+      const round = Math.max(...rounds);
+
+      const indexes = rows
+
+        .map((row, index) => row.period === period && revisionRoundNumber(row) === round && row.status !== 'Actual' ? index : -1)
+
+        .filter(index => index >= 0);
+
+      if (!indexes.length) return;
+
+      const beforeRows = structuredClone(rows);
+      pushUndo();
+
+      const firstRemoveIndex = Math.min(...indexes);
+
+      rows = rows.filter((_, index) => !indexes.includes(index));
+
+      normalizeSequentialRows(firstRemoveIndex);
+
+      setPendingChanges(beforeRows, { rowIndex: firstRemoveIndex, field: 'row' });
+
+      render();
+
+    }
+
+    function render() {
+
+      renderSummary();
+
+      renderContractSummary();
+
+      const step = Number(scale.value) || 7;
+
+      const isQuarter = step === 90;
+
+      document.documentElement.classList.toggle('quarter-scale', isQuarter);
+
+      const { min, max } = timelineBounds();
+
+      const totalDays = Math.max(1, diffDays(min, max));
+
+      const pxPerDay = scalePxPerDay(step);
+
+      const isPdfPrint = document.body.classList.contains('pdf-print');
+
+      const labelWidth = isPdfPrint ? 500 : 556;
+
+      const targetBoardWidth = isPdfPrint ? 1120 : Math.max(0, window.innerWidth - 48);
+
+      const fitTimelineWidth = isQuarter ? Math.max(0, targetBoardWidth - labelWidth) : 0;
+
+      const timelineWidth = isPdfPrint && isQuarter ? fitTimelineWidth : Math.max(minTimelineWidth(step), totalDays * pxPerDay, fitTimelineWidth);
+
+      const today = referenceDate();
+
       const todayLeft = today >= min && today <= max ? position(today, min, totalDays, timelineWidth) : null;
       const renderPeriods = periodStats(today);
 
@@ -1819,20 +3348,34 @@
 
       const overviewExtensionWidth = Math.max(0, overviewRight - overviewExtensionLeft);
 
-      const ticks = [];
-      let cursor = new Date(min);
-      cursor.setHours(0,0,0,0);
-      while (cursor <= max) {
-        ticks.push(new Date(cursor));
-        cursor = nextTickDate(cursor, step);
-      }
-      const months = [];
-      let monthCursor = new Date(min.getFullYear(), min.getMonth(), 1);
-      while (monthCursor <= max) {
-        months.push(new Date(monthCursor));
-        monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
-      }
-      document.documentElement.style.setProperty('--week-width', `${step * pxPerDay}px`);
+      const ticks = [];
+
+      let cursor = new Date(min);
+
+      cursor.setHours(0,0,0,0);
+
+      while (cursor <= max) {
+
+        ticks.push(new Date(cursor));
+
+        cursor = nextTickDate(cursor, step);
+
+      }
+
+      const months = [];
+
+      let monthCursor = new Date(min.getFullYear(), min.getMonth(), 1);
+
+      while (monthCursor <= max) {
+
+        months.push(new Date(monthCursor));
+
+        monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
+
+      }
+
+      document.documentElement.style.setProperty('--week-width', `${step * pxPerDay}px`);
+
       const leftHead = `<div>งวด</div><div>ช่วงวันทำงาน ทปษ.</div><div>ล่าช้าเทียบ TOR</div>`;
 
       let html = `
@@ -1875,263 +3418,442 @@
 
         </div>`;
 
-      renderPeriods.forEach(item => {
-        const currentRowClass = currentPeriod && item.period === currentPeriod.period ? ' current-period-row' : '';
-        const meetingDates = item.meetingDates
-          .map(date => isoDate(date))
-          .filter((value, index, list) => list.indexOf(value) === index);
-        const meetingText = meetingDates.length ? `${meetingDates.length} จุด` : '-';
-        const segments = item.rows.map((row, rowIndex) => {
-          const start = parseDate(row.start);
-          const end = endDate(row);
-          if (!start || !end) return '';
-          const left = position(start, min, totalDays, timelineWidth);
-          const right = position(addDays(end, 1), min, totalDays, timelineWidth);
-          const width = Math.max(4, right - left);
-          const cls = row.type === 'AOT' ? 'aot' : 'consultant';
+      renderPeriods.forEach(item => {
+        const currentRowClass = currentPeriod && item.period === currentPeriod.period ? ' current-period-row' : '';
+
+        const meetingDates = item.meetingDates
+
+          .map(date => isoDate(date))
+
+          .filter((value, index, list) => list.indexOf(value) === index);
+
+        const meetingText = meetingDates.length ? `${meetingDates.length} จุด` : '-';
+
+        const segments = item.rows.map((row, rowIndex) => {
+
+          const start = parseDate(row.start);
+
+          const end = endDate(row);
+
+          if (!start || !end) return '';
+
+          const left = position(start, min, totalDays, timelineWidth);
+
+          const right = position(addDays(end, 1), min, totalDays, timelineWidth);
+
+          const width = Math.max(4, right - left);
+
+          const cls = row.type === 'AOT' ? 'aot' : 'consultant';
+
           const timing = rowTiming(row, today);
 
-          const edgeClass = (rowIndex === 0 ? ' bar-start' : '') + (rowIndex === item.rows.length - 1 ? ' bar-end' : '');
-          return `<div class="bar ${cls} ${timing}${edgeClass}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)} | ${formatShort(row.start)} - ${formatShort(isoDate(end))} | ${durationValue(row)} วัน | ${timing === 'actual' ? 'Actual' : 'Estimate'}" style="left:${left}px;width:${width}px"></div>`;
-        }).join('');
-        const markers = meetingDates.map(value => {
-          const meeting = parseDate(value);
-          const meetLeft = meeting ? position(meeting, min, totalDays, timelineWidth) : null;
-          return meeting ? `<div class="meeting-marker" title="ประชุมตรวจรับ ${value}" style="left:${meetLeft}px"></div><div class="meeting-label" style="left:${meetLeft}px">${formatShort(value)}</div>` : '';
-        }).join('');
-        const plannedLayer = (() => {
-          if (!item.plannedEnd || !item.adjustedDue) return '';
-          const plannedLeft = position(item.plannedEnd, min, totalDays, timelineWidth);
-          const adjustedLeft = position(item.adjustedDue, min, totalDays, timelineWidth);
-          const reserveLeft = Math.min(plannedLeft, adjustedLeft);
-          const reserveWidth = Math.abs(adjustedLeft - plannedLeft);
-          const reserveBar = item.reserveBefore > 0
-            ? `<div class="reserve-bar" title="วันสงวนสิทธิ์สะสม ${item.reserveBefore} วัน" style="left:${reserveLeft}px;width:${Math.max(8, reserveWidth)}px"></div>`
-            : '';
-          return `
-            ${reserveBar}
-            <div class="planned-marker" title="กำหนดส่งเดิม ${isoDate(item.plannedEnd)}" style="left:${plannedLeft}px"></div>
-            <div class="planned-label" style="left:${plannedLeft}px">${formatShort(isoDate(item.plannedEnd))}</div>
-            <div class="adjusted-marker" title="กำหนดส่งใหม่ ${isoDate(item.adjustedDue)}" style="left:${adjustedLeft}px"></div>
-            <div class="adjusted-label" style="left:${adjustedLeft}px">${formatShort(isoDate(item.adjustedDue))}</div>`;
-        })();
-        const torDays = torDaysForPeriod(item.period);
-        const torVariance = torVarianceStatus(item.consultantCum, torDays);
-        const varianceClass = item.timing === 'estimate' ? 'forecast' : torVariance.cls;
+          const edgeClass = (rowIndex === 0 ? ' bar-start' : '') + (rowIndex === item.rows.length - 1 ? ' bar-end' : '');
+
+          return `<div class="bar ${cls} ${timing}${edgeClass}" title="${escapeAttr(row.org)} ${escapeAttr(row.item)} | ${formatShort(row.start)} - ${formatShort(isoDate(end))} | ${durationValue(row)} วัน | ${timing === 'actual' ? 'Actual' : 'Estimate'}" style="left:${left}px;width:${width}px"></div>`;
+
+        }).join('');
+
+        const markers = meetingDates.map(value => {
+
+          const meeting = parseDate(value);
+
+          const meetLeft = meeting ? position(meeting, min, totalDays, timelineWidth) : null;
+
+          return meeting ? `<div class="meeting-marker" title="ประชุมตรวจรับ ${value}" style="left:${meetLeft}px"></div><div class="meeting-label" style="left:${meetLeft}px">${formatShort(value)}</div>` : '';
+
+        }).join('');
+
+        const plannedLayer = (() => {
+
+          if (!item.plannedEnd || !item.adjustedDue) return '';
+
+          const plannedLeft = position(item.plannedEnd, min, totalDays, timelineWidth);
+
+          const adjustedLeft = position(item.adjustedDue, min, totalDays, timelineWidth);
+
+          const reserveLeft = Math.min(plannedLeft, adjustedLeft);
+
+          const reserveWidth = Math.abs(adjustedLeft - plannedLeft);
+
+          const reserveBar = item.reserveBefore > 0
+
+            ? `<div class="reserve-bar" title="วันสงวนสิทธิ์สะสม ${item.reserveBefore} วัน" style="left:${reserveLeft}px;width:${Math.max(8, reserveWidth)}px"></div>`
+
+            : '';
+
+          return `
+
+            ${reserveBar}
+
+            <div class="planned-marker" title="กำหนดส่งเดิม ${isoDate(item.plannedEnd)}" style="left:${plannedLeft}px"></div>
+
+            <div class="planned-label" style="left:${plannedLeft}px">${formatShort(isoDate(item.plannedEnd))}</div>
+
+            <div class="adjusted-marker" title="กำหนดส่งใหม่ ${isoDate(item.adjustedDue)}" style="left:${adjustedLeft}px"></div>
+
+            <div class="adjusted-label" style="left:${adjustedLeft}px">${formatShort(isoDate(item.adjustedDue))}</div>`;
+
+        })();
+
+        const torDays = torDaysForPeriod(item.period);
+
+        const torVariance = torVarianceStatus(item.consultantCum, torDays);
+
+        const varianceClass = item.timing === 'estimate' ? 'forecast' : torVariance.cls;
+        const variancePill = item.timing === 'estimate'
+          ? `<span class="forecast-pill-wrap"><span class="forecast-label">Estimate</span><span class="timing-pill ${varianceClass}">${torVariance.text}</span></span>`
+          : `<span class="timing-pill ${varianceClass}">${torVariance.text}</span>`;
+
         const leftCells = `
 
               <div class="period-cell"><b>${escapeText(item.period)}</b></div>
 
               <div class="period-cell">${periodRangeText(item)}</div>
 
-              <div class="period-cell"><span class="timing-pill ${varianceClass}">${torVariance.text}</span></div>`;
+              <div class="period-cell">${variancePill}</div>`;
 
-        html += `
-          <div class="gantt-row${currentRowClass}">
-            <div class="cell-grid">
-              ${leftCells}
-            </div>
-            <div class="timeline" style="width:${timelineWidth}px">
-              ${todayLeft !== null ? `<div class="today-line" style="left:${todayLeft}px"></div>` : ''}
-              ${segments}
-              ${plannedLayer}
-              ${markers}
-            </div>
-          </div>`;
-      });
-      board.innerHTML = html;
-      board.style.setProperty('--timeline-width', `${timelineWidth}px`);
-      if (todayLeft !== null) {
-        const line = document.createElement('div');
-        line.className = 'today-chart-line';
-        line.title = `วันนี้ ${formatShort(isoDate(today))}`;
-        line.style.left = `${labelWidth + todayLeft}px`;
-        board.appendChild(line);
-      }
-      renderEditor();
-      requestAnimationFrame(updateSliderBounds);
-    }
-    function updateSliderBounds() {
-      const maxScroll = Math.max(0, workspace.scrollWidth - workspace.clientWidth);
-      timelineSlider.max = String(Math.ceil(maxScroll));
-      timelineSlider.value = String(Math.min(workspace.scrollLeft, maxScroll));
-      timelineSlider.disabled = maxScroll === 0;
-    }
-    function syncSliderToScroll() {
-      timelineSlider.value = String(Math.min(workspace.scrollLeft, Number(timelineSlider.max) || 0));
-    }
-    function updateRow(target) {
-      const rowIndex = Number(target.dataset.row);
-      const field = target.dataset.field;
-      if (Number.isNaN(rowIndex) || !field) return;
-      const before = { ...rows[rowIndex] };
-      if (field === 'duration') {
-        const oldDuration = Math.max(1, Number(before.duration) || 1);
-        const newDuration = Math.max(1, Number(target.value) || 1);
-        rows[rowIndex][field] = newDuration;
-        shiftRowsFrom(rowIndex + 1, newDuration - oldDuration);
-      } else if (field === 'start') {
-        const oldStart = parseDate(before.start);
-        const newStart = parseDate(target.value);
-        rows[rowIndex][field] = target.value;
-        if (oldStart && newStart) {
-          const deltaDays = diffDays(oldStart, newStart);
-          rows[rowIndex].meeting = shiftDateValue(rows[rowIndex].meeting, deltaDays);
-          shiftRowsFrom(rowIndex + 1, deltaDays);
-        }
-      } else {
-        rows[rowIndex][field] = target.value;
-      }
-      if (field === 'type') {
-        rows[rowIndex].org = target.value === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
-      }
-      render();
-    }
-    function updateRow(target) {
-      const rowIndex = Number(target.dataset.row);
-      const field = target.dataset.field;
-      if (Number.isNaN(rowIndex) || !field || !rows[rowIndex]) return;
-      pushUndo();
-
-      const row = rows[rowIndex];
-      const oldStart = parseDate(row.start);
-      const oldEnd = endDate(row);
-
-      if (field === 'duration') {
-        row.duration = Math.max(1, Math.round(Number(target.value) || 1));
-        syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
-        normalizeSequentialRows(rowIndex + 1);
-      } else if (field === 'end') {
-        const start = parseDate(row.start);
-        const newEnd = parseDate(target.value);
-        if (start && newEnd) {
-          row.duration = Math.max(1, diffDays(start, newEnd) + 1);
-          syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
-          normalizeSequentialRows(rowIndex + 1);
-        }
-      } else if (field === 'start') {
-        const newStart = parseDate(target.value);
-        row.start = target.value;
-        if (oldStart && newStart) {
-          const deltaDays = diffDays(oldStart, newStart);
-          row.meeting = shiftDateValue(row.meeting, deltaDays);
-        }
-        normalizeSequentialRows(rowIndex + 1);
-      } else if (field === 'type') {
-        row.type = target.value === 'AOT' ? 'AOT' : 'Consultant';
-        row.org = row.type === 'AOT' ? 'ทอท.' : 'ที่ปรึกษา';
-      } else {
-        row[field] = target.value;
-      }
-
-      render();
-    }
-    board.addEventListener('input', event => {
-      const field = event.target.dataset.field;
-      if (!field || ['start', 'meeting', 'type'].includes(field)) return;
-      updateRow(event.target);
-    });
-    board.addEventListener('change', event => updateRow(event.target));
-    editor.addEventListener('input', event => {
-      if (event.target.dataset.field !== 'duration') return;
-      clearTimeout(durationEditTimer);
-      const target = event.target;
-      durationEditTimer = setTimeout(() => updateRow(target), 250);
-    });
-    editor.addEventListener('change', event => updateRow(event.target));
-    editor.addEventListener('click', event => {
-      if (event.target.dataset.action === 'undo') {
-        undoLastChange();
-        return;
-      }
-      const selected = editor.querySelector('#revisionPeriod');
-      if (!selected || !selected.value) return;
-      if (event.target.id === 'addRevisionRound') addRevisionRound(selected.value);
-      if (event.target.id === 'removeRevisionRound') removeLatestRevisionRound(selected.value);
-    });
-    scale.addEventListener('change', () => {
-      render();
-      if (Number(scale.value) === 90) {
-        requestAnimationFrame(() => {
-          workspace.scrollTo({ left: 0, behavior: 'auto' });
-          updateSliderBounds();
-        });
-      }
-    });
-    document.getElementById('toolbarAddRevisionRound').addEventListener('click', () => {
-      const selected = document.getElementById('toolbarRevisionPeriod');
-      if (selected && selected.value) addRevisionRound(selected.value);
-    });
-    document.getElementById('toolbarRemoveRevisionRound').addEventListener('click', () => {
-      const selected = document.getElementById('toolbarRevisionPeriod');
-      if (selected && selected.value) removeLatestRevisionRound(selected.value);
-    });
-    document.getElementById('undoBtn').addEventListener('click', undoLastChange);
-    document.getElementById('addRow').addEventListener('click', () => {
-      pushUndo();
-      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(referenceDate()), duration: 7, meeting: '', status: 'Draft' });
-      normalizeSequentialRows(rows.length - 1);
-      render();
-    });
-    function saveHtmlFile() {
-      saveRows();
-      const rowsJson = JSON.stringify(rows, null, 6);
-      const snapshotKey = `cra-auto-gantt-web-v4-${Date.now()}`;
-      let html = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
-      html = html.replace(/const defaultRows = \[[\s\S]*?\n    \];/, `const defaultRows = ${rowsJson};`);
-      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v\d+[^']*';/, `const storageKey = '${snapshotKey}';`);
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `CRA_Auto_Gantt_${isoDate(todayDate())}.html`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(link.href);
-    }
-    document.getElementById('saveHtmlBtn').addEventListener('click', saveHtmlFile);
-    referenceDateInput.addEventListener('change', () => {
-      localStorage.setItem(referenceDateStorageKey, referenceDateInput.value || isoDate(todayDate()));
-      render();
-    });
-    function scrollTimeline(direction) {
-      const distance = Math.round(workspace.clientWidth * 0.72);
-      workspace.scrollBy({ left: direction * distance, behavior: 'smooth' });
-    }
-    document.getElementById('scrollStart').addEventListener('click', () => workspace.scrollTo({ left: 0, behavior: 'smooth' }));
-    document.getElementById('scrollLeft').addEventListener('click', () => scrollTimeline(-1));
-    document.getElementById('scrollRight').addEventListener('click', () => scrollTimeline(1));
-    document.getElementById('scrollEnd').addEventListener('click', () => workspace.scrollTo({ left: workspace.scrollWidth, behavior: 'smooth' }));
-    timelineSlider.addEventListener('input', () => {
-      workspace.scrollTo({ left: Number(timelineSlider.value) || 0, behavior: 'auto' });
-    });
-    workspace.addEventListener('scroll', syncSliderToScroll, { passive: true });
-    window.addEventListener('resize', updateSliderBounds);
-    document.getElementById('printBtn').addEventListener('click', () => {
-      const previousScale = scale.value;
-      document.body.classList.add('pdf-print');
-      scale.value = '90';
-      render();
-      workspace.scrollTo({ left: 0, top: 0, behavior: 'auto' });
-      const restoreAfterPrint = () => {
-        document.body.classList.remove('pdf-print');
-        scale.value = previousScale;
-        render();
-        window.removeEventListener('afterprint', restoreAfterPrint);
-      };
-      window.addEventListener('afterprint', restoreAfterPrint);
-      requestAnimationFrame(() => window.print());
-    });
-    setupReferenceDate();
-    render();
-  </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
+        html += `
+
+          <div class="gantt-row${currentRowClass}">
+
+            <div class="cell-grid">
+
+              ${leftCells}
+
+            </div>
+
+            <div class="timeline" style="width:${timelineWidth}px">
+
+              ${todayLeft !== null ? `<div class="today-line" style="left:${todayLeft}px"></div>` : ''}
+
+              ${segments}
+
+              ${plannedLayer}
+
+              ${markers}
+
+            </div>
+
+          </div>`;
+
+      });
+
+      board.innerHTML = html;
+
+      board.style.setProperty('--timeline-width', `${timelineWidth}px`);
+
+      if (todayLeft !== null) {
+
+        const line = document.createElement('div');
+
+        line.className = 'today-chart-line';
+
+        line.title = `วันนี้ ${formatShort(isoDate(today))}`;
+
+        line.style.left = `${labelWidth + todayLeft}px`;
+
+        board.appendChild(line);
+
+      }
+
+      renderEditor();
+
+      renderChangeReview();
+
+      applyChangeMarkers();
+
+      updateSaveButtons();
+
+      requestAnimationFrame(updateSliderBounds);
+
+    }
+
+    function updateSliderBounds() {
+
+      const maxScroll = Math.max(0, workspace.scrollWidth - workspace.clientWidth);
+
+      timelineSlider.max = String(Math.ceil(maxScroll));
+
+      timelineSlider.value = String(Math.min(workspace.scrollLeft, maxScroll));
+
+      timelineSlider.disabled = maxScroll === 0;
+
+    }
+
+    function syncSliderToScroll() {
+
+      timelineSlider.value = String(Math.min(workspace.scrollLeft, Number(timelineSlider.max) || 0));
+
+    }
+
+    function updateRow(target) {
+      const rowIndex = Number(target.dataset.row);
+      const field = target.dataset.field;
+      if (Number.isNaN(rowIndex) || !field || !rows[rowIndex]) return;
+      const beforeRows = structuredClone(rows);
+      pushUndo();
+
+      const row = rows[rowIndex];
+      const oldStart = parseDate(row.start);
+      const oldEnd = endDate(row);
+
+      if (field === 'duration') {
+        row.duration = Math.max(1, Math.round(Number(target.value) || 1));
+        syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
+        normalizeSequentialRows(rowIndex + 1);
+      } else if (field === 'end') {
+        const start = parseDate(row.start);
+        const newEnd = parseDate(target.value);
+        if (start && newEnd) {
+          row.duration = Math.max(1, diffDays(start, newEnd) + 1);
+          syncMeetingWhenEndMoves(row, oldEnd, endDate(row));
+          normalizeSequentialRows(rowIndex + 1);
+        }
+      } else if (field === 'start') {
+        const newStart = parseDate(target.value);
+        row.start = target.value;
+        if (oldStart && newStart) {
+          const deltaDays = diffDays(oldStart, newStart);
+          row.meeting = shiftDateValue(row.meeting, deltaDays);
+        }
+        normalizeSequentialRows(rowIndex + 1);
+      } else if (field === 'type') {
+        row.type = target.value === 'AOT' ? 'AOT' : 'Consultant';
+        row.org = row.type === 'AOT' ? '\u0e17\u0e2d\u0e17.' : '\u0e17\u0e35\u0e48\u0e1b\u0e23\u0e36\u0e01\u0e29\u0e32';
+      } else {
+        row[field] = target.value;
+      }
+
+      setPendingChanges(beforeRows, { rowIndex, field });
+      render();
+    }
+
+    board.addEventListener('input', event => {
+
+      const field = event.target.dataset.field;
+
+      if (!field || ['start', 'meeting', 'type'].includes(field)) return;
+
+      updateRow(event.target);
+
+    });
+
+    board.addEventListener('change', event => updateRow(event.target));
+
+    editor.addEventListener('input', event => {
+
+      if (event.target.dataset.field !== 'duration') return;
+
+      clearTimeout(durationEditTimer);
+
+      const target = event.target;
+
+      durationEditTimer = setTimeout(() => updateRow(target), 250);
+
+    });
+
+    editor.addEventListener('change', event => updateRow(event.target));
+
+    editor.addEventListener('click', event => {
+
+      if (event.target.dataset.action === 'undo') {
+
+        undoLastChange();
+
+        return;
+
+      }
+
+      const selected = editor.querySelector('#revisionPeriod');
+
+      if (!selected || !selected.value) return;
+
+      if (event.target.id === 'addRevisionRound') addRevisionRound(selected.value);
+
+      if (event.target.id === 'removeRevisionRound') removeLatestRevisionRound(selected.value);
+
+    });
+
+    scale.addEventListener('change', () => {
+
+      render();
+
+      if (Number(scale.value) === 90) {
+
+        requestAnimationFrame(() => {
+
+          workspace.scrollTo({ left: 0, behavior: 'auto' });
+
+          updateSliderBounds();
+
+        });
+
+      }
+
+    });
+
+    document.getElementById('toolbarAddRevisionRound').addEventListener('click', () => {
+
+      const selected = document.getElementById('toolbarRevisionPeriod');
+
+      if (selected && selected.value) addRevisionRound(selected.value);
+
+    });
+
+    document.getElementById('toolbarRemoveRevisionRound').addEventListener('click', () => {
+
+      const selected = document.getElementById('toolbarRevisionPeriod');
+
+      if (selected && selected.value) removeLatestRevisionRound(selected.value);
+
+    });
+
+    document.getElementById('undoBtn').addEventListener('click', undoLastChange);
+
+    document.getElementById('addRow').addEventListener('click', () => {
+
+      const beforeRows = structuredClone(rows);
+      pushUndo();
+
+      rows.push({ period: 'งวดใหม่', org: 'ที่ปรึกษา', item: 'รายการใหม่', type: 'Consultant', start: isoDate(referenceDate()), duration: 7, meeting: '', status: 'Draft' });
+
+      normalizeSequentialRows(rows.length - 1);
+
+      render();
+
+    });
+
+    function saveHtmlFile() {
+
+      saveRows();
+
+      const rowsJson = JSON.stringify(rows, null, 6);
+
+      const snapshotKey = `cra-auto-gantt-web-v4-${Date.now()}`;
+
+      let html = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
+
+      html = html.replace(/const defaultRows = \[[\s\S]*?\n    \];/, `const defaultRows = ${rowsJson};`);
+
+      html = html.replace(/const storageKey = 'cra-auto-gantt-web-v\d+[^']*';/, `const storageKey = '${snapshotKey}';`);
+
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+
+      const link = document.createElement('a');
+
+      link.href = URL.createObjectURL(blob);
+
+      link.download = `CRA_Auto_Gantt_${isoDate(todayDate())}.html`;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      URL.revokeObjectURL(link.href);
+
+    }
+
+    document.getElementById('toolbarSaveChanges').addEventListener('click', saveCurrentChanges);
+
+    document.getElementById('exportCurrentDataBtn').addEventListener('click', exportCurrentData);
+
+    changeReview.addEventListener('click', event => {
+      if (event.target.id === 'saveChangesBtn') saveCurrentChanges();
+      if (event.target.id === 'discardDraftBtn') discardDraftChanges();
+      if (event.target.id === 'exportHistoryBtn') exportVersionHistory();
+    });
+
+    document.getElementById('saveHtmlBtn').addEventListener('click', saveHtmlFile);
+
+    referenceDateInput.addEventListener('change', () => {
+
+      localStorage.setItem(referenceDateStorageKey, referenceDateInput.value || isoDate(todayDate()));
+
+      render();
+
+    });
+
+    function scrollTimeline(direction) {
+
+      const distance = Math.round(workspace.clientWidth * 0.72);
+
+      workspace.scrollBy({ left: direction * distance, behavior: 'smooth' });
+
+    }
+
+    document.getElementById('scrollStart').addEventListener('click', () => workspace.scrollTo({ left: 0, behavior: 'smooth' }));
+
+    document.getElementById('scrollLeft').addEventListener('click', () => scrollTimeline(-1));
+
+    document.getElementById('scrollRight').addEventListener('click', () => scrollTimeline(1));
+
+    document.getElementById('scrollEnd').addEventListener('click', () => workspace.scrollTo({ left: workspace.scrollWidth, behavior: 'smooth' }));
+
+    timelineSlider.addEventListener('input', () => {
+
+      workspace.scrollTo({ left: Number(timelineSlider.value) || 0, behavior: 'auto' });
+
+    });
+
+    workspace.addEventListener('scroll', syncSliderToScroll, { passive: true });
+
+    window.addEventListener('resize', updateSliderBounds);
+
+    document.getElementById('printBtn').addEventListener('click', () => {
+
+      const previousScale = scale.value;
+
+      document.body.classList.add('pdf-print');
+
+      scale.value = '90';
+
+      render();
+
+      workspace.scrollTo({ left: 0, top: 0, behavior: 'auto' });
+
+      const restoreAfterPrint = () => {
+
+        document.body.classList.remove('pdf-print');
+
+        scale.value = previousScale;
+
+        render();
+
+        window.removeEventListener('afterprint', restoreAfterPrint);
+
+      };
+
+      window.addEventListener('afterprint', restoreAfterPrint);
+
+      requestAnimationFrame(() => window.print());
+
+    });
+
+    setupReferenceDate();
+
+    render();
+
+  </script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
