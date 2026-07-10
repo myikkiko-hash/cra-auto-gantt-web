@@ -1077,47 +1077,88 @@
   </div>
 
   <script>
-    const defaultRows = [
-      { period: 'งวด 1 Inception', org: 'ที่ปรึกษา', item: 'ส่งงาน', type: 'Consultant', start: '2025-08-22', duration: 29, meeting: '2025-09-25', status: 'Actual' },
-      { period: 'งวด 1 Inception', org: 'ทอท.', item: 'ตรวจรับ/ประชุม', type: 'AOT', start: '2025-09-20', duration: 1, meeting: '2025-09-25', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2025-09-20', duration: 41, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2025-10-31', duration: 25, meeting: '2025-11-17', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2025-11-25', duration: 52, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-01-16', duration: 41, meeting: '2026-02-17', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-02-26', duration: 2, meeting: '', status: 'Actual' },
-      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-02-28', duration: 1, meeting: '2026-03-05', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-02-28', duration: 26, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-03-26', duration: 29, meeting: '2026-04-10', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-04-24', duration: 7, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-05-01', duration: 28, meeting: '2026-05-21', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-05-29', duration: 15, meeting: '', status: 'Actual' },
-      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-06-13', duration: 1, meeting: '2026-06-23', status: 'Actual' },
-      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-06-13', duration: 18, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-07-01', duration: 30, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-07-31', duration: 14, meeting: '', status: 'Estimate' },
-      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-08-14', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-08-14', duration: 51, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-10-04', duration: 45, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-11-18', duration: 21, meeting: '', status: 'Estimate' },
-      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-12-09', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-12-09', duration: 16, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-12-25', duration: 30, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-01-24', duration: 9, meeting: '', status: 'Estimate' },
-      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-02-02', duration: 1, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2027-02-02', duration: 46, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2027-03-20', duration: 45, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-05-04', duration: 14, meeting: '', status: 'Estimate' },
-      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-05-18', duration: 1, meeting: '', status: 'Estimate' }
-    ];
-
-    const board = document.getElementById('board');
-    const editor = document.getElementById('editor');
-    const summary = document.getElementById('summary');
-    const contractSummary = document.getElementById('contractSummary');
-    const workspace = document.querySelector('.workspace');
-    const timelineSlider = document.getElementById('timelineSlider');
-    const scale = document.getElementById('scale');
-    const referenceDateInput = document.getElementById('referenceDate');
+    const defaultRows = [
+
+      { period: 'งวด 1 Inception', org: 'ที่ปรึกษา', item: 'ส่งงาน', type: 'Consultant', start: '2025-08-22', duration: 29, meeting: '2025-09-25', status: 'Actual' },
+
+      { period: 'งวด 1 Inception', org: 'ทอท.', item: 'ตรวจรับ/ประชุม', type: 'AOT', start: '2025-09-20', duration: 1, meeting: '2025-09-25', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2025-09-20', duration: 41, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2025-10-31', duration: 25, meeting: '2025-11-17', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2025-11-25', duration: 52, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-01-16', duration: 41, meeting: '2026-02-17', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-02-26', duration: 2, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 2 Schematic', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-02-28', duration: 1, meeting: '2026-03-05', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-02-28', duration: 26, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-03-26', duration: 29, meeting: '2026-04-10', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-04-24', duration: 7, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 2', type: 'AOT', start: '2026-05-01', duration: 28, meeting: '2026-05-21', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ที่ปรึกษา', item: 'รอบ 3', type: 'Consultant', start: '2026-05-29', duration: 15, meeting: '', status: 'Actual' },
+
+      { period: 'งวด 3 Preliminary', org: 'ทอท.', item: 'พิจารณา รอบ 3 ผ่าน', type: 'AOT', start: '2026-06-13', duration: 1, meeting: '2026-06-23', status: 'Actual' },
+
+      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-06-13', duration: 18, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-07-01', duration: 30, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 4 Development', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-07-31', duration: 14, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 4 Development', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-08-14', duration: 1, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-08-14', duration: 51, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-10-04', duration: 45, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 5 Detail Design', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2026-11-18', duration: 21, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 5 Detail Design', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2026-12-09', duration: 1, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2026-12-09', duration: 16, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2026-12-25', duration: 30, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 6 Submitted Drawings', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-01-24', duration: 9, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 6 Submitted Drawings', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-02-02', duration: 1, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 1', type: 'Consultant', start: '2027-02-02', duration: 46, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 1', type: 'AOT', start: '2027-03-20', duration: 45, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 7 Tender Document', org: 'ที่ปรึกษา', item: 'รอบ 2', type: 'Consultant', start: '2027-05-04', duration: 14, meeting: '', status: 'Estimate' },
+
+      { period: 'งวด 7 Tender Document', org: 'ทอท.', item: 'พิจารณา รอบ 2 ผ่าน', type: 'AOT', start: '2027-05-18', duration: 1, meeting: '', status: 'Estimate' }
+
+    ];
+
+
+
+    const board = document.getElementById('board');
+
+    const editor = document.getElementById('editor');
+
+    const summary = document.getElementById('summary');
+
+    const contractSummary = document.getElementById('contractSummary');
+
+    const workspace = document.querySelector('.workspace');
+
+    const timelineSlider = document.getElementById('timelineSlider');
+
+    const scale = document.getElementById('scale');
+
+    const referenceDateInput = document.getElementById('referenceDate');
+
     const storageKey = 'cra-auto-gantt-web-v4';
     const referenceDateStorageKey = 'cra-auto-gantt-reference-date-v1';
     const undoLimit = 10;
@@ -1500,31 +1541,57 @@
         <div class="metric"><b>${currentPeriod ? currentPeriod.reserveBefore : 0} วัน</b><span>วันสงวนสิทธิ์ถึงปัจจุบัน (realized)<br>นับถึงก่อน ${currentPeriod ? escapeText(currentPeriod.period) : '-'}</span></div>
       `;
     }
-    function renderContractSummary() {
-      const today = referenceDate();
+    function renderContractSummary() {
+
+      const today = referenceDate();
+
       const stats = periodStats(today);
       const currentPeriod = currentPeriodStats(stats, today);
-      const rowsHtml = stats.map(item => {
-        const torDays = torDaysForPeriod(item.period);
+      const rowsHtml = stats.map(item => {
+
+        const torDays = torDaysForPeriod(item.period);
+
         const variance = torVarianceStatus(item.consultantCum, torDays);
-        const currentClass = currentPeriod && item.period === currentPeriod.period ? ' class="current-period-summary"' : '';
-        return `
-          <tr${currentClass}>
-            <td>${escapeText(item.period)}</td>
-            <td>${periodRangeText(item)}</td>
-            <td>${item.consultant}</td>
-            <td>${item.consultantCum}</td>
-            <td>${torDays}</td>
-            <td class="${variance.cls}">${variance.text}</td>
-          </tr>`;
-      }).join('');
-      contractSummary.innerHTML = `
-        <div class="contract-summary-head">
-          <h2>สรุปวันทำงานสะสม เทียบ TOR</h2>
-          <div class="contract-summary-note">Bottom line: วันทำงาน ทปษ. สะสมต้องไม่เกิน 365 วันตาม TOR</div>
-        </div>
-        <table>
-          <thead>
+        const currentClass = currentPeriod && item.period === currentPeriod.period ? ' class="current-period-summary"' : '';
+
+        return `
+
+          <tr${currentClass}>
+
+            <td>${escapeText(item.period)}</td>
+
+            <td>${periodRangeText(item)}</td>
+
+            <td>${item.consultant}</td>
+
+            <td>${item.consultantCum}</td>
+
+            <td>${item.aot}</td>
+
+            <td>${item.aotCum}</td>
+
+            <td>${torDays}</td>
+
+            <td class="${variance.cls}">${variance.text}</td>
+
+          </tr>`;
+
+      }).join('');
+
+      contractSummary.innerHTML = `
+
+        <div class="contract-summary-head">
+
+          <h2>สรุปวันทำงานสะสม เทียบ TOR</h2>
+
+          <div class="contract-summary-note">Bottom line: วันทำงาน ทปษ. สะสมต้องไม่เกิน 365 วันตาม TOR</div>
+
+        </div>
+
+        <table>
+
+          <thead>
+
             <tr>
 
               <th>งวด</th>
@@ -1543,11 +1610,16 @@
 
               <th>ส่วนต่าง</th>
 
-            </tr>
-          </thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>`;
-    }
+            </tr>
+
+          </thead>
+
+          <tbody>${rowsHtml}</tbody>
+
+        </table>`;
+
+    }
+
     function renderEditor() {
       const today = referenceDate();
       const stats = periodStats(today);
