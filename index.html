@@ -1591,6 +1591,12 @@
 
     .editor-table th:last-child { border-right: 0; }
 
+    .editor-table tr.editor-period-band td {
+
+      background: rgba(243, 232, 255, .55);
+
+    }
+
     .editor-table tr.current-work-row td {
 
       background: #fff7ed;
@@ -3054,6 +3060,10 @@
 
       if (toolbarRevisionPeriod) toolbarRevisionPeriod.innerHTML = periodOptions;
 
+      let lastEditorPeriod = '';
+
+      let editorBandIndex = -1;
+
       const body = rows.map((row, index) => {
 
         const end = endDate(row);
@@ -3062,13 +3072,29 @@
 
         const isCurrentWorkRow = rowStart && end && today >= rowStart && today <= end;
 
+        if (row.period !== lastEditorPeriod) {
+
+          lastEditorPeriod = row.period;
+
+          editorBandIndex += 1;
+
+        }
+
+        const rowClasses = [
+
+          editorBandIndex % 2 ? 'editor-period-band' : '',
+
+          isCurrentWorkRow ? 'current-work-row' : ''
+
+        ].filter(Boolean).join(' ');
+
         const timing = rowTiming(row, today);
 
         const typeValue = row.type === 'AOT' ? 'AOT' : 'Consultant';
 
         return `
 
-          <tr class="${isCurrentWorkRow ? 'current-work-row' : ''}">
+          <tr class="${rowClasses}">
 
             <td class="editor-period" title="${escapeAttr(row.period)}">${escapeText(row.period)}</td>
 
